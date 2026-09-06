@@ -212,19 +212,9 @@ The next phase is to evolve NovaChat from an application that calls an LLM API i
 	- Return cached responses for high-similarity queries and record cache hit rates.
 	- Add expiration and invalidation rules when prompts, personas, or retrieved documents change.
 
-9. **Human feedback and evaluation data**
-	- Add thumbs-up and thumbs-down controls to assistant messages.
-	- Store optional feedback comments alongside each message.
-	- Export negatively rated responses as JSONL for regression testing and future evaluation or fine-tuning workflows.
-	- Build a small evaluation set covering correctness, groundedness, latency, and refusal behavior.
-
-### Suggested Execution Order
+### Planned Execution Order
 
 1. **Week 1:** Implement true SSE streaming and context-window management.
 2. **Week 2:** Add RAG with MongoDB Atlas Vector Search.
 3. **Week 3:** Add tool calling and Langfuse observability.
 4. **Week 4:** Polish the UI with cost and latency metrics, then deploy the frontend and backend.
-
-### Target Project Narrative
-
-After these improvements, NovaChat can be presented as a full-stack, RAG-enabled LLM application built with React, Node.js, MongoDB, and Groq. The project will demonstrate real-time SSE responses, controlled context usage, grounded answers from private documents, tool-assisted workflows, provider abstraction, and production observability with token and cost tracking.
