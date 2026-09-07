@@ -89,7 +89,7 @@ For development with automatic backend restarts, use:
 
 ```bash
 cd Backend
-npx nodemon server.js
+nodemon server.js
 ```
 
 ## API Reference
@@ -139,18 +139,12 @@ Run these from `Frontend/`:
 
 ```bash
 npm run dev      # Start the Vite development server
-npm run build    # Create a production build in dist/
-npm run preview  # Preview the production build locally
-npm run lint     # Run ESLint
 ```
 
 ## Backend Notes
 
 The backend calls Groq's OpenAI-compatible chat-completions endpoint using the `openai/gpt-oss-20b` model. CORS is currently configured for `http://localhost:5173`; update the origin in `Backend/server.js` when deploying the frontend elsewhere.
 
-## Roadmap
-
-Planned work is tracked in `newFeatures.md`, including authentication, image generation, voice input, Ollama support, richer context, RAG, and deployment configuration.
 
 ## Future Work: Production-Grade AI System
 
