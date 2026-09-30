@@ -1,6 +1,6 @@
 import express from "express"
 import Thread from "../models/Thread.js"
-import getLLMResponse from "../utils/openai.js"
+import getLLMResponse from "../utils/llmServe.js"
 
 const router = express.Router();
 
@@ -94,7 +94,7 @@ router.post("/chat", async(req, res)=>{
                 }
             ]
             try{
-                thread.summary = await getLLMResponse(systemPrompt, 200)
+                thread.summary = await getLLMResponse(systemPrompt, { max_tokens: 200 })
                 thread.lastSummerizedLength += BATCH_SIZE
             } catch(summaryErr){
                 console.error("failed to generate summary: ", summaryErr)

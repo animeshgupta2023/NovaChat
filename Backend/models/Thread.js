@@ -8,7 +8,7 @@ const MessageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        require: true
+        required: true
     },
     timestamp: {
         type: Date,

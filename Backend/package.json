@@ -1,5 +1,10 @@
 { 
   "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node src/app.js",
+    "prod": "pm2 src/app.js"
+  },
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

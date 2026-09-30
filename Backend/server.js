@@ -21,7 +21,7 @@ app.listen(PORT, ()=>{
 
 const connectDB = async ()=>{
     try{
-        await mongoose.connect(process.env.MONGODB_URI)
+        await mongoose.connect(process.env.LOCAL_MONGODB_URI)
         console.log("Connected with database")
     } catch(err){
         console.log("Failed to connect with Db", err)
