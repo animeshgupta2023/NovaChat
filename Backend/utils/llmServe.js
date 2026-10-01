@@ -5,22 +5,26 @@ const PROVIDERS = {
         url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         apiKey: process.env.GEMINI_API_KEY,
         //defaultModel: "gemini-3.8-flash",
-        defaultModel: "gemini-3.5-flash"
+        defaultModel: "gemini-3.5-flash",
+        max_tokens:100000,
     },
     groq: {
         url: "https://api.groq.com/openai/v1/chat/completions",
         apiKey: process.env.GROQ_API_KEY,
         defaultModel: "qwen/qwen3.8-27b",
+        max_tokens:5000,
     },
     nvidia: {
         url: "https://integrate.api.nvidia.com/v1/chat/completions",
         apiKey: process.env.NVIDIA_API_KEY,
         defaultModel: "deepseek-ai/deepseek-v4.1-flash",
+        max_tokens:100000,
     },
     openrouter:{
         url: "https://openrouter.ai/api/v1/chat/completions",
         apiKey:process.env.OPENROUTER_API_KEY,
-        defaultModel: "qwen/qwen3.8-27b:free"
+        defaultModel: "qwen/qwen3.8-27b:free",
+        max_tokens:100000,
     }
 }
 
@@ -37,8 +41,14 @@ const getLLMResponse = async(messages, config={})=>{
     }
 
     const model = config.model || provider.defaultModel;
-    const max_tokens = config.max_tokens || 800;
+    const max_tokens = config.max_tokens || provider.max_tokens;
     const stream = config.stream ?? false;
+
+    if(config.summarize === true && provider === "groq"){
+        max_tokens = 200;
+    } else if(config.summarize === true){
+        max_tokens = 2000;
+    }
 
     const options = {
         method: "POST",
@@ -74,7 +84,7 @@ const getLLMResponse = async(messages, config={})=>{
 
         return data.choices[0].message.content 
     } catch(err){
-        console.log(err)
+        console.error(err)
         throw err
     }
 }

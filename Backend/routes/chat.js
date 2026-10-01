@@ -50,6 +50,7 @@ router.delete("/thread/:threadId", async(req, res)=>{
 
 router.post("/chat", async(req, res)=>{
     const {threadId, message} = req.body;
+    const provider = "gemini";
 
     if(!threadId || !message){
         return res.status(400).json({error: "missing required fields"})
@@ -92,11 +93,13 @@ router.post("/chat", async(req, res)=>{
                     role: "user",
                     content: `Existing Summary: ${thread.summary || 'None'}\n\n New messages to incorporate: \n${batchMessages}`
                 }
-            ]
+            ];
+
             try{
                 thread.summary = await getLLMResponse(systemPrompt, { 
-                    max_tokens: 200, 
-                    stream: false 
+                    stream: false,
+                    provider: provider,
+                    summarize: true,
                 });
                 thread.lastSummerizedLength += BATCH_SIZE;
             } catch(summaryErr){
@@ -123,28 +126,29 @@ router.post("/chat", async(req, res)=>{
 
         const providerStream = await getLLMResponse(messagesForLLM, {
             stream: true, 
-            provider: "groq",
-            max_tokens:3000,
+            provider: provider,
+            summarize: false,
         });
-
+        
+        // tells the client to keep the connection open for streaming
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive"); 
-        res.flushHeaders();
+        res.flushHeaders(); // tells the client this is the sse event
 
-        const reader = providerStream.getReader();
-        const decoder = new TextDecoder();
+        const reader = providerStream.getReader(); // llm response
+        const decoder = new TextDecoder(); // converts the raw bytes to text
 
-        let buffer = "";
+        let buffer = ""; // temp storage for partiall chunks until full sse message arrives
         let assistantReply = "";
         let providerDone = false;
 
         while(!providerDone){
-            const { value, done } = await reader.read();
+            const { value, done } = await reader.read(); // reads the chunks
             buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
 
             let boundary;
-            while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+            while ((boundary = buffer.indexOf("\n\n")) !== -1) { //SSE messages are separated by double newlines (\n\n).
                 const event = buffer.slice(0, boundary);
                 buffer = buffer.slice(boundary + 2);
 
@@ -165,7 +169,7 @@ router.post("/chat", async(req, res)=>{
 
                 if (textChunk) {
                     assistantReply += textChunk;
-                    res.write(`data: ${JSON.stringify({ content: textChunk })}\n\n`);
+                    res.write(`data: ${JSON.stringify({ content: textChunk })}\n\n`); // sending to client
                 }
             }
             if (done) break;
