@@ -26,7 +26,12 @@ const ThreadSchema = new mongoose.Schema({
         type: String,
         default: "New Chat"
     },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     messages: [MessageSchema],
+    
     summary: {
         type: String, 
         default: ""

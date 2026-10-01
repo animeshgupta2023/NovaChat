@@ -5,7 +5,7 @@ const PROVIDERS = {
         url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         apiKey: process.env.GEMINI_API_KEY,
         //defaultModel: "gemini-3.8-flash",
-        defaultModel: "gemini-3.5-flash",
+        defaultModel: "gemini-3.5-flash-lite",
         max_tokens:100000,
     },
     groq: {

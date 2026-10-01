@@ -5,6 +5,7 @@ Recruiters don't hire for "built a ChatGPT clone", because thousands of candidat
 1. **Authentication and multi-user support.** Sign-up and login with JWT (access and refresh tokens) or sessions, password hashing with bcrypt, a `userId` on every thread, and ownership checks on every route. This is the most common gap in student projects, and it teaches you authorization bugs (IDOR), which come up in interviews constantly.
 
 
+
 3. **Deployment.** Frontend on Vercel or Netlify, backend on Render, Railway or Fly.io, database on MongoDB Atlas. A live link matters more than almost anything else, because many recruiters won't clone your repo but will click a link. Add environment-based config and proper CORS.
 will do it at last
 
@@ -30,3 +31,10 @@ will do it at last
 15. **Frontend polish.** Responsive layout, accessibility, dark and light themes, optimistic UI, error toasts, and a code-block copy button.
 
 
+# top tier
+must do feature
+2. **multi step reasoning**
+breadown the query if unclear
+adding webserach
+query into multiple sub queries
+rag
