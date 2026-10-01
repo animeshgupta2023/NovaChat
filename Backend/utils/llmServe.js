@@ -4,7 +4,8 @@ const PROVIDERS = {
     gemini: {
         url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         apiKey: process.env.GEMINI_API_KEY,
-        defaultModel: "gemini-3.8-flash",
+        //defaultModel: "gemini-3.8-flash",
+        defaultModel: "gemini-3.5-flash"
     },
     groq: {
         url: "https://api.groq.com/openai/v1/chat/completions",
@@ -23,8 +24,6 @@ const PROVIDERS = {
     }
 }
 
-
-
 const getLLMResponse = async(messages, config={})=>{
     const providerKey = config.provider || "groq"; 
     const provider = PROVIDERS[providerKey];
@@ -39,6 +38,7 @@ const getLLMResponse = async(messages, config={})=>{
 
     const model = config.model || provider.defaultModel;
     const max_tokens = config.max_tokens || 800;
+    const stream = config.stream ?? false;
 
     const options = {
         method: "POST",
@@ -50,15 +50,21 @@ const getLLMResponse = async(messages, config={})=>{
             model: model, // context window size is 262k tokens or 200k words for free teir it is 8k tokens only
             messages,
             max_tokens: max_tokens,
+            stream,
         })
-    }
+    };
 
     try{
-        const response = await fetch(provider.url, options)
+        const response = await fetch(provider.url, options);
 
         if(!response.ok){
             const errorData = await response.json().catch(()=>({}));
-            throw new Error(errorData?.error?.message || `HTTP error! status: ${response.status}`)
+            throw new Error(
+                errorData?.error?.message || `HTTP error! status: ${response.status}` 
+            );
+        }
+        if(stream){
+            return response.body;
         }
         const data = await response.json()
          

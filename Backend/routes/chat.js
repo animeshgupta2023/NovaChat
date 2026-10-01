@@ -94,10 +94,13 @@ router.post("/chat", async(req, res)=>{
                 }
             ]
             try{
-                thread.summary = await getLLMResponse(systemPrompt, { max_tokens: 200 })
-                thread.lastSummerizedLength += BATCH_SIZE
+                thread.summary = await getLLMResponse(systemPrompt, { 
+                    max_tokens: 200, 
+                    stream: false 
+                });
+                thread.lastSummerizedLength += BATCH_SIZE;
             } catch(summaryErr){
-                console.error("failed to generate summary: ", summaryErr)
+                console.error("failed to generate summary: ", summaryErr);
             }
         }
 
@@ -105,7 +108,7 @@ router.post("/chat", async(req, res)=>{
             messagesForLLM.push({
                 role: "system",
                 content: `Context from earlier in the conversation: ${thread.summary}`,
-            })
+            });
         }
         
         const recentMessages = thread.messages
@@ -118,17 +121,72 @@ router.post("/chat", async(req, res)=>{
 
         messagesForLLM.push(...recentMessages);
 
-        const assistantReply = await getLLMResponse(messagesForLLM)
+        const providerStream = await getLLMResponse(messagesForLLM, {
+            stream: true, 
+            provider: "groq",
+            max_tokens:3000,
+        });
+
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive"); 
+        res.flushHeaders();
+
+        const reader = providerStream.getReader();
+        const decoder = new TextDecoder();
+
+        let buffer = "";
+        let assistantReply = "";
+        let providerDone = false;
+
+        while(!providerDone){
+            const { value, done } = await reader.read();
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+
+            let boundary;
+            while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+                const event = buffer.slice(0, boundary);
+                buffer = buffer.slice(boundary + 2);
+
+                const dataLine = event
+                    .split(/\r?\n/)
+                    .find((line) => line.startsWith("data:"));
+
+                if (!dataLine) continue;
+
+                const data = dataLine.slice(5).trim();
+                if (data === "[DONE]") {
+                    providerDone = true;
+                    break;
+                }
+
+                const payload = JSON.parse(data);
+                const textChunk = payload.choices?.[0]?.delta?.content;
+
+                if (textChunk) {
+                    assistantReply += textChunk;
+                    res.write(`data: ${JSON.stringify({ content: textChunk })}\n\n`);
+                }
+            }
+            if (done) break;
+        }
 
         thread.messages.push({role: "assistant", content: assistantReply}) 
         thread.updatedAt = new Date()
-
         await thread.save()
-        res.json({reply: assistantReply})
+
+        res.write(`event: done\ndata: {}\n\n`);
+        res.end();
 
     } catch(err){
-        console.log("unable to get suitable response",err) 
-        res.status(500).json({error: "Server Error"})
+        console.error("unable to get suitable response",err) 
+
+        if (res.headersSent) {
+            res.write(`event: error\ndata: ${JSON.stringify({ message: "Stream failed" })}\n\n`);
+            res.end();
+        } else {
+            res.status(500).json({ error: "Server Error" });
+        }
     }
 })
 
