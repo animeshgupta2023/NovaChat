@@ -152,18 +152,7 @@ The next phase is to evolve NovaChat from an application that calls an LLM API i
 
 ### Phase 1: Core LLM Engineering
 
-1. **True streaming with Server-Sent Events (SSE)**
-	- Enable Groq streaming with `stream: true`.
-	- Change the chat endpoint to return `text/event-stream`.
-	- Forward response chunks from the backend as they arrive.
-	- Consume the stream with the frontend `fetch` API and `ReadableStream` reader.
-	- Replace the current simulated typewriter effect with token-level updates.
-
-2. **Context-window management**
-	- Send only a sliding window of recent messages, such as the last 10 turns.
-	- Add summarization when a thread exceeds a configured message threshold.
-	- Preserve the summary as system context while removing older raw messages from the LLM request.
-	- Track token usage so context limits and request costs remain visible.
+1. **user authentication**
 
 3. **Provider abstraction and model swapping**
 	- Introduce an `LLMService` abstraction behind the chat route.
@@ -206,9 +195,3 @@ The next phase is to evolve NovaChat from an application that calls an LLM API i
 	- Return cached responses for high-similarity queries and record cache hit rates.
 	- Add expiration and invalidation rules when prompts, personas, or retrieved documents change.
 
-### Planned Execution Order
-
-1. **Week 1:** Implement true SSE streaming and context-window management.
-2. **Week 2:** Add RAG with MongoDB Atlas Vector Search.
-3. **Week 3:** Add tool calling and Langfuse observability.
-4. **Week 4:** Polish the UI with cost and latency metrics, then deploy the frontend and backend.
