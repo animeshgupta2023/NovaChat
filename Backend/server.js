@@ -9,6 +9,7 @@ import session from "express-session";
 import User from "./models/Users.js"
 import chatRoutes from "./routes/chat.js"
 import userRoutes from "./routes/user.js"
+import ExpressError from "./utils/ExpressError.js"
 
 const app = express()
 const PORT = 8080

@@ -1,12 +1,18 @@
 import express from "express"
 import Thread from "../models/Thread.js"
 import getLLMResponse from "../utils/llmServe.js"
+import { isLoggedIn } from "../middlewares.js";
 
 const router = express.Router();
 
+router.use(isLoggedIn)
+
 router.get("/thread", async(req, res)=>{
     try{
-        const threads = await Thread.find({}).sort({updatedAt: -1})
+        const threads = await Thread.find({owner: req.user._id})
+        .select("threadId title updatedAt") // in the side bar we only need threadId and title
+        .sort({updatedAt: -1})
+
         res.json(threads)
     } catch(err){
         console.log(err);
@@ -18,10 +24,14 @@ router.get("/thread/:threadId", async(req, res)=>{
     const {threadId} = req.params;
 
     try{
-        const thread = await Thread.findOne({threadId})
+        // getting the thread only if the user is the owner
+        const thread = await Thread.findOne({
+            threadId,
+            owner: req.user._id,
+        })
 
         if(!thread){
-            return res.status(404).json({ error: "Thread not found" });
+            return res.status(404).json({ error: "Thread not found or unauthorized" });
         }
 
         res.json(thread.messages)
@@ -35,10 +45,13 @@ router.delete("/thread/:threadId", async(req, res)=>{
     const {threadId} = req.params;
 
     try{
-        const deletedThread = await Thread.findOneAndDelete({threadId})
+        const deletedThread = await Thread.findOneAndDelete({
+            threadId,
+            owner: req.user._id
+        })
 
         if(!deletedThread){
-            return res.status(404).json({ error: "Thread not found" });
+            return res.status(404).json({ error: "Thread not found or unauthorized" });
         }
 
         res.status(200).json({success: "Thread deleted Successfully"})
@@ -60,12 +73,16 @@ router.post("/chat", async(req, res)=>{
     const BATCH_SIZE = 4;   // summerize the older messages in batches of 4 to save API Calls
 
     try{
-        let thread = await Thread.findOne({threadId})
+        let thread = await Thread.findOne({
+            threadId,
+            owner: req.user._id,
+        })
 
         if(!thread){
             thread = new Thread({
                 threadId,
                 title: message.slice(0, 30),
+                owner: req.user._id,
                 messages: [{role: "user", content: message}],
                 summary: "",
                 lastSummerizedLength: 0
