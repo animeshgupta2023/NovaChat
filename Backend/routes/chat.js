@@ -86,9 +86,11 @@ router.post("/chat", async(req, res)=>{
                 messages: [{role: "user", content: message}],
                 summary: "",
                 lastSummerizedLength: 0
-            })    
+            })
+            await thread.save()
         } else{
             thread.messages.push({role: "user", content: message})
+            await thread.save()
         }
         
         let messagesForLLM = []

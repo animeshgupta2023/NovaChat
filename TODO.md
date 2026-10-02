@@ -1,8 +1,3 @@
-Recruiters don't hire for "built a ChatGPT clone", because thousands of candidates have that on their resume. They hire for what you can explain and defend in an interview: why you made a choice, what broke, and how you fixed it. So pick features that show real engineering skills, and do fewer of them properly.
-
-## Tier 1: Do these first (they cover most of what interviewers ask)
-
-1. **Authentication and multi-user support.** Sign-up and login with JWT (access and refresh tokens) or sessions, password hashing with bcrypt, a `userId` on every thread, and ownership checks on every route. This is the most common gap in student projects, and it teaches you authorization bugs (IDOR), which come up in interviews constantly.
 
 
 

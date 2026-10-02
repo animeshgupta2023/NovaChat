@@ -1,35 +1,77 @@
 import './App.css'
-import Sidebar from "./Sidebar.jsx"
-import ChatWindow from "./ChatWindow.jsx"
-import {MyContext} from "./MyContext.jsx"
-import { useState } from 'react'
-import {v1 as uuidv1} from 'uuid'
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom"
+import { useEffect, useState } from "react"
+
+import ChatApp from "./pages/ChatApp.jsx"
+import Landing from './pages/Landing.jsx'
+import Authentication from "./pages/Authentication.jsx"
+
+const isAuthenticated = () => localStorage.getItem("novachat_logged_in") === "true"
+
+async function verifySession() {
+    try {
+        const response = await fetch("http://localhost:8080/auth/session", {
+            method: "GET",
+            credentials: "include",
+        })
+
+        return response.ok
+    } catch {
+        return false
+    }
+}
+
+function ProtectedRoute({ children }) {
+    const [isChecking, setIsChecking] = useState(true)
+    const [authorized, setAuthorized] = useState(false)
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            if (!isAuthenticated()) {
+                setAuthorized(false)
+                setIsChecking(false)
+                return
+            }
+
+            const validSession = await verifySession()
+            if (!validSession) {
+                localStorage.removeItem("novachat_logged_in")
+                localStorage.removeItem("novachat_user")
+            }
+
+            setAuthorized(validSession)
+            setIsChecking(false)
+        }
+
+        checkAuth()
+    }, [])
+
+    if (isChecking) {
+        return null
+    }
+
+    return authorized ? children : <Navigate to="/auth?mode=login" replace />
+}
 
 function App() {
-  const [prompt, setPrompt] = useState("")
-  const [reply, setReply] = useState(null)
-  const [currThreadId, setCurrThreadId] = useState(uuidv1)
-  const [prevChats, setPrevChats] = useState([])
-  const [newChat, setNewChat] = useState(true) 
-  const [allThreads, setAllThreads] = useState([])
-
-  const providerValues = {
-    prompt, setPrompt,
-    reply, setReply,
-    currThreadId, setCurrThreadId,
-    newChat, setNewChat,
-    prevChats, setPrevChats,
-    allThreads, setAllThreads,
-  }
-  
-  return (
-    <div className='app'>
-      <MyContext.Provider value={providerValues}>
-        <Sidebar></Sidebar>
-        <ChatWindow></ChatWindow>
-      </MyContext.Provider>
-    </div>
-  )
+    return (
+        <>
+            <Router>
+              <Routes>
+                  <Route path='/' element={<Landing/>}></Route>
+                  <Route
+                    path='/home'
+                    element={
+                        <ProtectedRoute>
+                            <ChatApp />
+                        </ProtectedRoute>
+                    }
+                  ></Route>
+                  <Route path='/auth' element={<Authentication/>}></Route>
+              </Routes>
+            </Router>
+        </>
+    );
 }
 
 export default App

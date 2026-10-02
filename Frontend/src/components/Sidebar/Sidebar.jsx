@@ -1,14 +1,16 @@
 import "./Sidebar.css"
 import { useContext, useEffect } from "react"
-import {MyContext} from "./MyContext.jsx"
+import {MyContext} from "../../context/MyContext.jsx"
 import {v1 as uuidv1} from 'uuid'
 
 export default function Sidebar(){
-    const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats} = useContext(MyContext)
+    const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats, currentUser, prevChats} = useContext(MyContext)
 
     const getAllThreads = async()=>{
         try{
-            const response = await fetch("http://localhost:8080/api/thread")
+            const response = await fetch("http://localhost:8080/api/thread", {
+                credentials: "include",
+            })
             const res = await response.json()
             const filteredData = res.map(thread => ({threadId: thread.threadId, title: thread.title}))   
             setAllThreads(filteredData)
@@ -19,7 +21,7 @@ export default function Sidebar(){
 
     useEffect(()=>{
         getAllThreads()
-    }, [currThreadId])
+    }, [currThreadId, prevChats.length])
 
     const createNewChat = ()=>{
         setNewChat(true) 
@@ -33,7 +35,9 @@ export default function Sidebar(){
         setCurrThreadId(newThreadId)
 
         try{
-            const response = await fetch(`http://localhost:8080/api/thread/${newThreadId}`)
+            const response = await fetch(`http://localhost:8080/api/thread/${newThreadId}`, {
+                credentials: "include",
+            })
             const res = await response.json()
             setPrevChats(res)
             setNewChat(false)
@@ -45,7 +49,10 @@ export default function Sidebar(){
 
     const deleteThread = async(threadId) =>{
         try{
-            const response = await fetch(`http://localhost:8080/api/thread/${threadId}`, {method: "DELETE"})
+            const response = await fetch(`http://localhost:8080/api/thread/${threadId}`, {
+                method: "DELETE",
+                credentials: "include",
+            })
             const res = await response.json()
 
             setAllThreads(prev=> prev.filter(thread=>thread.threadId !== threadId))
@@ -84,7 +91,8 @@ export default function Sidebar(){
             </ul>
 
             <div className="sign">
-                <p>By Animesh Gupta</p>
+                <p className="userDisplayName">{currentUser?.username || "Guest"}</p>
+                <p className="userDisplayEmail">{currentUser?.email || "Not signed in"}</p>
             </div>
         </section>
     )

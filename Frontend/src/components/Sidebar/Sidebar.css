@@ -72,6 +72,21 @@ button:hover{
     flex-shrink: 0; 
 }
 
+.userDisplayName {
+    margin: 0;
+    color: #fff;
+    font-weight: 600;
+}
+
+.userDisplayEmail {
+    margin: 0.3rem 0 0;
+    font-size: 0.75rem;
+    color: #bdbdbd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .history .fa-solid{
     opacity: 0;
     position: absolute;

@@ -1,20 +1,41 @@
 import "./ChatWindow.css"
-import Chat from "./Chat.jsx"
-import { MyContext } from "./MyContext.jsx"
-import { useContext, useState } from "react"
+import Chat from "../Chat/Chat.jsx"
+import { MyContext } from "../../context/MyContext.jsx"
+import { useContext, useEffect, useRef, useState } from "react"
 import { ScaleLoader } from "react-spinners"
+import { useNavigate } from "react-router-dom"
 
 export default function ChatWindow() {
-    const {
+    const navigate = useNavigate()
+    const { 
         prompt,
         setPrompt,
         currThreadId,
         setPrevChats,
         setNewChat,
+        currentUser,
     } = useContext(MyContext)
 
     const [loading, setLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
+    const userButtonRef = useRef(null)
+
+    useEffect(() => {
+        if (!isOpen) return
+
+        const handleOutsideClick = (event) => {
+            const clickedOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target)
+            const clickedOutsideButton = userButtonRef.current && !userButtonRef.current.contains(event.target)
+
+            if (clickedOutsideDropdown && clickedOutsideButton) {
+                setIsOpen(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleOutsideClick)
+        return () => document.removeEventListener("mousedown", handleOutsideClick)
+    }, [isOpen])
 
     const getReply = async () => {
         const userMessage = prompt.trim()
@@ -40,6 +61,7 @@ export default function ChatWindow() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     message: userMessage,
                     threadId: currThreadId,
@@ -148,28 +170,54 @@ export default function ChatWindow() {
         setIsOpen(!isOpen)
     }
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/logout", {
+                method: "GET",
+                credentials: "include",
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || "Logout failed")
+            }
+
+            localStorage.removeItem("novachat_logged_in")
+            localStorage.removeItem("novachat_user")
+            setIsOpen(false)
+            navigate("/auth?mode=login")
+        } catch (error) {
+            console.error("Logout error:", error)
+            alert(error.message || "Unable to log out right now.")
+        }
+    }
+
     return (
         <div className="chatWindow">
             <div className="navbar">
                 <span>
                     NovaChat <i className="fa-solid fa-chevron-down"></i>
                 </span>
-                <div className="userIconDiv" onClick={handleProfileClick}>
-                    <span className="userIcon">
-                        <i className="fa-solid fa-user"></i>
-                    </span>
-                </div>
+<div ref={userButtonRef} className="userIconDiv" onClick={handleProfileClick}>
+                <span className="userIcon">
+                    <i className="fa-solid fa-user"></i>
+                </span>
+            </div>
             </div>
 
             {isOpen && (
-                <div className="dropDown">
+                <div ref={dropdownRef} className="dropDown">
+                    <div className="profileSummary">
+                        <div className="profileName">{currentUser?.username || "Guest"}</div>
+                        <div className="profileEmail">{currentUser?.email || "No email"}</div>
+                    </div>
                     <div className="dropDownItem">
                         <i className="fa-solid fa-gear"></i> Settings
                     </div>
                     <div className="dropDownItem">
                         <i className="fa-solid fa-cloud-arrow-up"></i> Upgrade Plan
                     </div>
-                    <div className="dropDownItem">
+                    <div className="dropDownItem" onClick={handleLogout} style={{ cursor: "pointer" }}>
                         <i className="fa-solid fa-arrow-right-from-bracket"></i> Logout
                     </div>
                 </div>

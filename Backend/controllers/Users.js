@@ -59,4 +59,18 @@ const logout = async(req, res, next)=>{
     })
 }
 
-export {login, signup, logout};
+const getCurrentUser = async(req, res)=>{
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    return res.status(200).json({
+        user: {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email,
+        }
+    });
+}
+
+export {login, signup, logout, getCurrentUser};

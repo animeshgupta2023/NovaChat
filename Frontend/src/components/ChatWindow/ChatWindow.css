@@ -102,13 +102,34 @@ input:focus{
     position: absolute;
     top: 4rem;
     right: 4rem;
-    width: 150px;
+    width: 180px;
     background-color: #323232;
-    padding: 0.3rem 0.5rem;
-    border-radius: 6px;
+    padding: 0.5rem;
+    border-radius: 8px;
     text-align: left;
     z-index: 1000;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profileSummary{
+    padding: 0.6rem 0.5rem 0.7rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0.2rem;
+}
+
+.profileName{
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.profileEmail{
+    font-size: 0.72rem;
+    color: #bdbdbd;
+    margin-top: 0.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dropDownItem{
