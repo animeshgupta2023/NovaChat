@@ -34,6 +34,8 @@ export default function ChatWindow() {
         }
 
         document.addEventListener("mousedown", handleOutsideClick)
+
+        // a cleanup function below runs just before next time when the  UseEffect runs
         return () => document.removeEventListener("mousedown", handleOutsideClick)
     }, [isOpen])
 
@@ -198,11 +200,11 @@ export default function ChatWindow() {
                 <span>
                     NovaChat <i className="fa-solid fa-chevron-down"></i>
                 </span>
-<div ref={userButtonRef} className="userIconDiv" onClick={handleProfileClick}>
-                <span className="userIcon">
-                    <i className="fa-solid fa-user"></i>
-                </span>
-            </div>
+                <div ref={userButtonRef} className="userIconDiv" onClick={handleProfileClick}>
+                    <span className="userIcon">
+                        <i className="fa-solid fa-user"></i>
+                    </span>
+                </div>
             </div>
 
             {isOpen && (

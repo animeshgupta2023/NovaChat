@@ -1,8 +1,3 @@
-
-
-
-
-
 ## Tier 2: What makes you stand out for AI-related roles
 
 6. **RAG (retrieval-augmented generation).** Let users upload a PDF or text file, chunk it, create embeddings, store them in a vector database (MongoDB Atlas Vector Search, pgvector or Qdrant), retrieve relevant chunks per question, and show citations. This is one of the most in-demand skills for AI application roles right now, and it gives you plenty to talk about: chunking strategies, embedding models, top-k, and evaluation.

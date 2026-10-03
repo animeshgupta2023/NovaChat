@@ -27,7 +27,7 @@ export default function Sidebar(){
         setNewChat(true) 
         setPrompt("")
         setReply(null)
-        setCurrThreadId(uuidv1())
+        setCurrThreadId(uuidv1()) 
         setPrevChats([])
     }
 
