@@ -18,6 +18,8 @@ export default function ChatWindow() {
 
     const [loading, setLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+
+    const fileinputRef = useRef(null)
     const dropdownRef = useRef(null)
     const userButtonRef = useRef(null)
 
@@ -194,6 +196,35 @@ export default function ChatWindow() {
         }
     }
 
+    const handleDocumentUpload = async (event) => { 
+        const input = event.currentTarget
+        const file = input.files?.[0]
+        if (!file) return
+
+        const formData = new FormData()
+        formData.append("file", file) 
+
+        try {
+            const response = await fetch("http://localhost:8080/document/upload", {
+                method: "POST",
+                credentials: "include",
+                body: formData,
+            })
+
+            const result = await response.json().catch(() => ({}))
+            if (!response.ok) {
+                throw new Error(result.error || result.message || "Upload failed")
+            }
+
+            alert(result.message || "Document uploaded and indexed.")
+        } catch (error) {
+            console.error("Document upload failed:", error)
+            alert(error.message || "Document upload failed.")
+        } finally {
+            input.value = ""
+        }
+    }
+
     return (
         <div className="chatWindow">
             <div className="navbar">
@@ -231,7 +262,27 @@ export default function ChatWindow() {
 
             <div className="chatInput">
                 <div className="inputBox">
+
+                    <button
+                        type="button"
+                        className="uploadButton"
+                        aria-label="Upload a document"
+                        onClick={()=>fileinputRef.current?.click()}
+                    >
+                        <i className="fa-solid fa-plus" aria-hidden="true"></i>   
+                    </button>
+
                     <input
+                        ref={fileinputRef}
+                        className="documentFileInput"
+                        type="file"
+                        accept=".pdf,.txt"
+                        onChange={handleDocumentUpload}
+                    />
+
+
+                    <input
+                        className="promptInput"
                         placeholder="Ask Anything"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}

@@ -9,6 +9,7 @@ import session from "express-session";
 import User from "./models/Users.js"
 import chatRoutes from "./routes/chat.js"
 import userRoutes from "./routes/user.js"
+import documentRoutes from "./routes/document.js"
 import ExpressError from "./utils/ExpressError.js"
 
 const app = express()
@@ -46,6 +47,7 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use("/api", chatRoutes)
 app.use("/auth", userRoutes)
+app.use("/document", documentRoutes)
  
 app.all(/.*/, (req, res, next) => {
     next(new ExpressError(404, "page not found!"));
@@ -73,3 +75,16 @@ app.listen(PORT, ()=>{
     console.log(`server running on port ${PORT}`)
     connectDB()
 }) 
+
+
+
+
+
+
+
+
+// ====================================== rag feature ==============================================
+
+// pdf-parse (or @langchain/community): extracts raw text from user-uploaded PDFs or documents.
+// multer: handles multipart document uploads in Express.
+// @google/genai: official SDK for Gemini embedding models.

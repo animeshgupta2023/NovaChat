@@ -41,10 +41,10 @@ const getLLMResponse = async(messages, config={})=>{
     }
 
     const model = config.model || provider.defaultModel;
-    const max_tokens = config.max_tokens || provider.max_tokens;
+    let max_tokens = config.max_tokens || provider.max_tokens;
     const stream = config.stream ?? false;
 
-    if(config.summarize === true && provider === "groq"){
+    if(config.summarize === true && providerKey === "groq"){
         max_tokens = 200;
     } else if(config.summarize === true){
         max_tokens = 2000;

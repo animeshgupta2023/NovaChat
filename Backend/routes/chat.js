@@ -1,7 +1,9 @@
 import express from "express"
+
 import Thread from "../models/Thread.js"
 import getLLMResponse from "../utils/llmServe.js"
 import { isLoggedIn } from "../middlewares.js";
+import { getEmbedding, findRelevantChunks } from "../utils/ragUtils.js";
 
 const router = express.Router();
 
@@ -142,6 +144,21 @@ router.post("/chat", async(req, res)=>{
         }));
 
         messagesForLLM.push(...recentMessages);
+
+        // rag part 
+        const queryEmbedding = await getEmbedding(message);
+        const relevantDocs = await findRelevantChunks(queryEmbedding, req.user._id, 3);
+
+        if(relevantDocs.length > 0){
+            const contextSnippet = relevantDocs
+                .map((doc, idx)=>`[Source \(${idx + 1} (\)${doc.docName})]:\n${doc.content}`)
+                .join("\n\n");
+
+            messagesForLLM.unshift({
+                role: "system",
+                content: `You have access to the user's private documents. Answer their query using the context below where relevant. If the answer cannot be found in the context, use your general knowledge but indicate this clearly.\n\nDOCUMENT CONTEXT:\n${contextSnippet}`,
+            });
+        }
 
         const providerStream = await getLLMResponse(messagesForLLM, {
             stream: true, 
