@@ -220,13 +220,4 @@ The upload route requires authentication and an existing thread owned by the cur
 - The system prompt asks the model to cite filenames, but citations are free-form generated text rather than validated citation objects.
 - Add ingestion limits, server-side file validation, retrieval evaluation cases, and robust document deletion/re-indexing as the RAG feature matures.
 
-## Resume-Ready Project Highlights
-
-- Built a full-stack AI chat application with React, Express, MongoDB, Gemini, and real-time SSE response streaming.
-- Implemented authenticated multi-user conversation management using Passport local authentication, server-side sessions, and owner-scoped thread access.
-- Added long-conversation context management that incrementally summarizes older message batches and combines persisted summaries with recent chat history.
-- Developed a document RAG pipeline with PDF/text ingestion, overlapping text chunking, locally generated Transformer embeddings, MongoDB persistence, and cosine-similarity retrieval scoped to a user's thread.
-- Integrated retrieved document context into streamed LLM responses with source-file citation instructions and explicit handling for answers not supported by retrieved text.
-
-These highlights describe implemented functionality. Automatic query classification, ambiguity resolution, and multi-subquery retrieval remain planned improvements.
 
