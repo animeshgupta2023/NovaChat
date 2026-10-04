@@ -6,9 +6,18 @@ const documentChunkSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    threadId:{
+        type: String,
+        required: true,
+        index: true,
+    },
     docName: {
         type: String,
         required: true,
+    },
+    docSummaryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
     },
     content: {
         type: String,

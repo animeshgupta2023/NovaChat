@@ -69,9 +69,13 @@ function cosineSimilarity(vecA, vecB){
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-export async function findRelevantChunks(queryEmbedding, userId, limit=3){
+export async function findRelevantChunks(queryEmbedding, userId, threadId, limit=3, minScore = 0.42){
     const DocumentChunk = (await import("../models/DocumentChunk.js")).default;
-    const userChunks = await DocumentChunk.find({owner: userId}).lean();
+
+    const userChunks = await DocumentChunk.find({
+        owner: userId,
+        threadId: threadId,
+    }).lean();
 
     if(!userChunks || userChunks.length === 0) return [];
 
@@ -82,6 +86,7 @@ export async function findRelevantChunks(queryEmbedding, userId, limit=3){
     }));
 
     return scoredChunks
+        .filter((chunk) => chunk.score >= minScore)
         .sort((a, b)=>b.score - a.score)
         .slice(0, limit);
 }

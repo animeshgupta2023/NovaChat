@@ -72,6 +72,7 @@ export default function ChatWindow() {
                 }),
             })
 
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
                 throw new Error(
@@ -203,6 +204,7 @@ export default function ChatWindow() {
 
         const formData = new FormData()
         formData.append("file", file) 
+        formData.append("threadId", currThreadId)
 
         try {
             const response = await fetch("http://localhost:8080/document/upload", {

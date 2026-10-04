@@ -16,6 +16,21 @@ const MessageSchema = new mongoose.Schema({
     }
 });
 
+const DocumentMetaSchema = new mongoose.Schema({
+    docName: {
+        type: String, 
+        required: true
+    },
+    summary: {
+        type: String,
+        required: true,
+    },
+    uploadedAt: {
+        type: Date,
+        default: Date.now,
+    }
+})
+
 const ThreadSchema = new mongoose.Schema({
     threadId: {
         type: String,
@@ -31,8 +46,8 @@ const ThreadSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    messages: [MessageSchema],
-    
+    messages: [MessageSchema], 
+    documents: [DocumentMetaSchema],
     summary: {
         type: String, 
         default: ""
@@ -40,6 +55,10 @@ const ThreadSchema = new mongoose.Schema({
     lastSummerizedLength: {
         type: Number,
         default: 0,
+    },
+    hasDocuments: {
+        type: Boolean,
+        default: false
     },
     createdAt: {
         type: Date,
