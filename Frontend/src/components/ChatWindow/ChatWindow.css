@@ -170,3 +170,16 @@ input:focus{
     border-radius: 6px;
 }
 
+
+.stagedFileBadge{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #2f2f2f;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    max-width: 700px;
+    width: fit-content;
+}

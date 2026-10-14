@@ -1,29 +1,41 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Node.js CI
+name: NovaChat CI
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-and-check:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [24.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [22.x] # 22 LTS is standard and stable for @huggingface/transformers
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+
+    # 1. Check Backend syntax & dependencies
+    - name: Install Backend Dependencies
+      working-directory: ./Backend
+      run: npm install
+
+    - name: Syntax Check Backend
+      working-directory: ./Backend
+      run: node --check server.js
+
+    # 2. Check Frontend build
+    - name: Install Frontend Dependencies
+      working-directory: ./Frontend
+      run: npm install
+
+    - name: Build Frontend
+      working-directory: ./Frontend
+      run: npm run build

@@ -2,8 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MyContext } from "../context/MyContext.jsx";
 import "./Authentication.css";
-
-const API_URL = "http://localhost:8080";
+import {API_URL} from "../config.js"
 
 export default function Authentication() {
   const navigate = useNavigate();

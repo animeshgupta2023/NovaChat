@@ -2,13 +2,14 @@ import "./Sidebar.css"
 import { useContext, useEffect } from "react"
 import {MyContext} from "../../context/MyContext.jsx"
 import {v1 as uuidv1} from 'uuid'
+import { API_URL } from "../../config.js"
 
 export default function Sidebar(){
     const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats, currentUser, prevChats} = useContext(MyContext)
 
     const getAllThreads = async()=>{
         try{
-            const response = await fetch("http://localhost:8080/api/thread", {
+            const response = await fetch(`${API_URL}/api/thread`, {
                 credentials: "include",
             })
             const res = await response.json()
@@ -35,7 +36,7 @@ export default function Sidebar(){
         setCurrThreadId(newThreadId)
 
         try{
-            const response = await fetch(`http://localhost:8080/api/thread/${newThreadId}`, {
+            const response = await fetch(`${API_URL}/api/thread/${newThreadId}`, {
                 credentials: "include",
             })
             const res = await response.json()
@@ -49,7 +50,7 @@ export default function Sidebar(){
 
     const deleteThread = async(threadId) =>{
         try{
-            const response = await fetch(`http://localhost:8080/api/thread/${threadId}`, {
+            const response = await fetch(`${API_URL}/api/thread/${threadId}`, {
                 method: "DELETE",
                 credentials: "include",
             })

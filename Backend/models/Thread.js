@@ -52,7 +52,7 @@ const ThreadSchema = new mongoose.Schema({
         type: String, 
         default: ""
     },
-    lastSummerizedLength: {
+    lastSummarizedLength: {
         type: Number,
         default: 0,
     },

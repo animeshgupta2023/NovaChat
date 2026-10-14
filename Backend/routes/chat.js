@@ -1,7 +1,7 @@
 import express from "express"
 
 import { isLoggedIn } from "../middlewares.js";
-import { getAllThreads, ThreadInfo, deleteThread, chat } from "../controllers/chats.js";
+import { getAllThreads, ThreadInfo, deleteThread, chat } from "../controllers/Chats.js";
 
 
 const router = express.Router();

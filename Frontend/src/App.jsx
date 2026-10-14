@@ -5,12 +5,13 @@ import { useEffect, useState } from "react"
 import ChatApp from "./pages/ChatApp.jsx"
 import Landing from './pages/Landing.jsx'
 import Authentication from "./pages/Authentication.jsx"
+import {API_URL} from "./config.js"
 
 const isAuthenticated = () => localStorage.getItem("novachat_logged_in") === "true"
 
 async function verifySession() {
     try {
-        const response = await fetch("http://localhost:8080/auth/session", {
+        const response = await fetch(`${API_URL}/auth/session`, {
             method: "GET",
             credentials: "include",
         })

@@ -84,7 +84,7 @@ const chat = async(req, res)=>{
                 owner: req.user._id,
                 messages: [{role: "user", content: message}],
                 summary: "",
-                lastSummerizedLength: 0
+                lastSummarizedLength: 0
             })
             await thread.save()
         } else{
@@ -98,7 +98,7 @@ const chat = async(req, res)=>{
         if(unsummerizedCount >= MAX_HISTORY){
 
             const batchMessages = thread.messages
-            .slice(thread.lastSummerizedLength, thread.lastSummerizedLength + BATCH_SIZE)
+            .slice(thread.lastSummarizedLength, thread.lastSummarizedLength + BATCH_SIZE)
             .map((m)=>`${m.role}: ${m.content}`)
             .join('\n')
 
@@ -119,13 +119,13 @@ const chat = async(req, res)=>{
                     provider: provider,
                     summarize: true,
                 });
-                thread.lastSummerizedLength += BATCH_SIZE;
+                thread.lastSummarizedLength += BATCH_SIZE;
             } catch(summaryErr){
                 console.error("failed to generate summary: ", summaryErr);
             }
         }
 
-        if(thread.lastSummerizedLength > 0){
+        if(thread.lastSummarizedLength > 0){
             messagesForLLM.push({
                 role: "system",
                 content: `Context from earlier in the conversation: ${thread.summary}`,
@@ -133,7 +133,7 @@ const chat = async(req, res)=>{
         }
         
         const recentMessages = thread.messages
-        .slice(thread.lastSummerizedLength)
+        .slice(thread.lastSummarizedLength)
         .slice(-MAX_HISTORY)
         .map(({role, content}) => ({
             role, 
@@ -144,10 +144,8 @@ const chat = async(req, res)=>{
 
         // rag part 
         if(thread.hasDocuments){
-
-             
             const queryEmbedding = await getEmbedding(message);
-            const relevantDocs = await findRelevantChunks(queryEmbedding, req.user._id, threadId, 3, 0.0);
+            const relevantDocs = await findRelevantChunks(queryEmbedding, req.user._id, threadId, 3, 0.42);
 
             if(relevantDocs.length > 0){
                 const contextSnippet = relevantDocs

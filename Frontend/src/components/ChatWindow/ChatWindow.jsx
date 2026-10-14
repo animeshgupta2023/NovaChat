@@ -4,6 +4,7 @@ import { MyContext } from "../../context/MyContext.jsx"
 import { useContext, useEffect, useRef, useState } from "react"
 import { ScaleLoader } from "react-spinners"
 import { useNavigate } from "react-router-dom"
+import { API_URL } from "../../config.js"
 
 export default function ChatWindow() {
     const navigate = useNavigate()
@@ -18,10 +19,15 @@ export default function ChatWindow() {
 
     const [loading, setLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+    const [attachedFile, setAttachedFile] = useState(null)
 
     const fileinputRef = useRef(null)
     const dropdownRef = useRef(null)
     const userButtonRef = useRef(null)
+
+    useEffect(() => {
+        setAttachedFile(null)
+    }, [currThreadId])
 
     useEffect(() => {
         if (!isOpen) return
@@ -48,19 +54,32 @@ export default function ChatWindow() {
             return
         }
 
+        const fileToUpload = attachedFile;
+
         setNewChat(false)
         setLoading(true)
         setPrompt("")
+        setAttachedFile(null)
+
+        const displayMessage = fileToUpload
+            ? `[Attached: ${fileToUpload.name}]\n${userMessage}`
+            : userMessage;
 
         // Add the user message and an empty assistant message once.
         setPrevChats((chats) => [
             ...chats,
-            { role: "user", content: userMessage },
+            { role: "user", content: displayMessage },
             { role: "assistant", content: "" },
         ])
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat", {
+
+            if(fileToUpload){
+                await uploadStagedDocument(fileToUpload)
+            }
+
+
+            const response = await fetch(`${API_URL}/api/chat`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -177,7 +196,7 @@ export default function ChatWindow() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/logout", {
+            const response = await fetch(`${API_URL}/auth/logout`, {
                 method: "GET",
                 credentials: "include",
             })
@@ -197,34 +216,29 @@ export default function ChatWindow() {
         }
     }
 
-    const handleDocumentUpload = async (event) => { 
-        const input = event.currentTarget
-        const file = input.files?.[0]
+    const handleFileSelect = (event) => {
+        const file = event.currentTarget.files?.[0]
         if (!file) return
+        setAttachedFile(file)
+        event.currentTarget.value = "" // Reset input so same file can be re-selected if removed
+    }
 
+    const uploadStagedDocument = async (fileToUpload) => {
         const formData = new FormData()
-        formData.append("file", file) 
+        formData.append("file", fileToUpload)
         formData.append("threadId", currThreadId)
 
-        try {
-            const response = await fetch("http://localhost:8080/document/upload", {
-                method: "POST",
-                credentials: "include",
-                body: formData,
-            })
+        const response = await fetch(`${API_URL}/document/upload`, {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+        })
 
-            const result = await response.json().catch(() => ({}))
-            if (!response.ok) {
-                throw new Error(result.error || result.message || "Upload failed")
-            }
-
-            alert(result.message || "Document uploaded and indexed.")
-        } catch (error) {
-            console.error("Document upload failed:", error)
-            alert(error.message || "Document upload failed.")
-        } finally {
-            input.value = ""
+        const result = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            throw new Error(result.error || result.message || "Document upload failed")
         }
+        return result
     }
 
     return (
@@ -263,6 +277,19 @@ export default function ChatWindow() {
             <ScaleLoader color="#fff" loading={loading} />
 
             <div className="chatInput">
+                {attachedFile && (
+                    <div className="stagedFileBadge">
+                        <i className="fa-solid fa-file-pdf" style={{ color: "#339cfa" }}></i>
+                        <span>{attachedFile.name}</span>
+                        <i
+                            className="fa-solid fa-xmark"
+                            style={{ cursor: "pointer", marginLeft: "6px", color: "#aaa" }}
+                            onClick={() => setAttachedFile(null)}
+                            title="Remove file"
+                        ></i>
+                    </div>
+                )}
+
                 <div className="inputBox">
 
                     <button
@@ -279,7 +306,7 @@ export default function ChatWindow() {
                         className="documentFileInput"
                         type="file"
                         accept=".pdf,.txt"
-                        onChange={handleDocumentUpload}
+                        onChange={handleFileSelect}
                     />
 
 

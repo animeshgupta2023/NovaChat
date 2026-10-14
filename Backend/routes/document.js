@@ -24,9 +24,15 @@ router.post("/upload", upload.single("file"), async(req, res)=>{
             return res.status(400).json({error: "threadId is required"});
         }
 
-        const thread = await Thread.findOne({threadId, owner: req.user._id});
+        let thread = await Thread.findOne({threadId, owner: req.user._id});
         if (!thread) {
-            return res.status(404).json({ error: "Thread not found" });
+            thread = new Thread({
+                threadId,
+                title: req.file.originalname.slice(0, 30),
+                owner: req.user._id,
+                messages: [],
+                documents: [],
+            });
         }
 
         let extractedText = "";
@@ -78,7 +84,7 @@ router.post("/upload", upload.single("file"), async(req, res)=>{
         thread.hasDocuments = true;
         await thread.save();
 
-        const summaryId = docEntry._id;
+        const summaryId = thread.documents[thread.documents.length-1]._id;
 
         for(const chunk of chunks){
             const embedding = await getEmbedding(chunk);
@@ -93,7 +99,7 @@ router.post("/upload", upload.single("file"), async(req, res)=>{
         }
 
         res.status(200).json({
-            message: `Document "\(${req.file.originalname}" processed into\)${chunks.length} chunks.`,
+            message: `Document "\(${req.file.originalname}" processed into)${chunks.length} chunks.`,
         })
     }catch(err){
         console.error("RAG upload error: ", err);
