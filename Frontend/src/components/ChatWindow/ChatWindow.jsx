@@ -24,6 +24,7 @@ export default function ChatWindow() {
     const fileinputRef = useRef(null)
     const dropdownRef = useRef(null)
     const userButtonRef = useRef(null)
+    const [statusText, setStatusText] = useState("")
 
     useEffect(() => {
         setAttachedFile(null)
@@ -124,6 +125,11 @@ export default function ChatWindow() {
 
                 const payload = JSON.parse(data)
 
+                if (eventName === "status") {
+                    setStatusText(payload.label || "")
+                    return
+                }
+
                 if (eventName === "error") {
                     throw new Error(payload.message || "The response stream failed")
                 }
@@ -187,6 +193,7 @@ export default function ChatWindow() {
             })
         } finally {
             setLoading(false)
+            setStatusText("")
         }
     }
 
@@ -275,6 +282,12 @@ export default function ChatWindow() {
             <Chat />
 
             <ScaleLoader color="#fff" loading={loading} />
+
+            {statusText && (
+                <div style={{ color: "#60a5fa", fontSize: "0.85rem", marginBottom: "6px" }}>
+                    <i className="fa-solid fa-sparkles"></i> {statusText}
+                </div>
+            )}
 
             <div className="chatInput">
                 {attachedFile && (

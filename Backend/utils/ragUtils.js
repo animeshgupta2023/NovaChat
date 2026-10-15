@@ -1,34 +1,21 @@
 import { pipeline } from "@huggingface/transformers";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
+const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,
+    chunkOverlap: 150,
+    separators: ["\n\n", "\n", ". ", " ", ""],
+});
 
 // text chunking utility
-export function chunkText(text, chunkSize=800, overlap=150){
-    let chunks=[];
-    let startIndex = 0;
-
-    while(startIndex < text.length){
-        let endIndex = startIndex + chunkSize;
-        let chunk = text.slice(startIndex, endIndex);
-
-        if(endIndex < text.length){
-            const lastSpace = chunk.lastIndexOf(" ");
-            if(lastSpace !== -1){
-                chunk = chunk.slice(0, lastSpace);
-                endIndex = startIndex + lastSpace;
-            }
-        }
-
-        chunks.push(chunk.trim());
-        startIndex = endIndex - overlap;
-    }
-
-    return chunks.filter((chunk)=>chunk.length > 50);
+export async function chunkText(text){
+    const docs = await splitter.createDocuments([text]);
+    return docs
+        .map((d) => d.pageContent.trim())
+        .filter((chunk) => chunk.length > 50);
 }
 
-
-
-
-// generating embedding using xenova
- 
+// HuggingFace Embeddings (384-dim)
 let embedder = null;
 
 async function getEmbedder() {
@@ -49,9 +36,6 @@ export async function getEmbedding(text) {
     }
 }
 
-
-
-
 // vector similarity search part
 function cosineSimilarity(vecA, vecB){
     let dotProduct = 0;
@@ -69,25 +53,54 @@ function cosineSimilarity(vecA, vecB){
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-export async function findRelevantChunks(queryEmbedding, userId, threadId, limit=3, minScore = 0.42){
+export async function findRelevantChunks(queryEmbedding, userId, threadId, limit=3, minScore = 0.42, targetDocNames = []){
     const DocumentChunk = (await import("../models/DocumentChunk.js")).default;
 
-    const userChunks = await DocumentChunk.find({
-        owner: userId,
-        threadId: threadId,
-    }).lean();
+    const filter = { owner: userId, threadId };
+    if (targetDocNames.length > 0) {
+        filter.docName = { $in: targetDocNames };
+    }
 
+    const userChunks = await DocumentChunk.find(filter).lean();
     if(!userChunks || userChunks.length === 0) return [];
 
-    const scoredChunks = userChunks.map((chunk)=>({
-        docName: chunk.docName,
-        content: chunk.content,
-        score: cosineSimilarity(queryEmbedding, chunk.embedding),
-    }));
-
-    return scoredChunks
+    return userChunks
+        .map((chunk) => ({
+            id: String(chunk._id),
+            docName: chunk.docName,
+            content: chunk.content,
+            score: cosineSimilarity(queryEmbedding, chunk.embedding),
+        }))
         .filter((chunk) => chunk.score >= minScore)
-        .sort((a, b)=>b.score - a.score)
+        .sort((a, b) => b.score - a.score)
         .slice(0, limit);
 }
 
+
+// Multi-Query Search with Reciprocal Rank Fusion (RRF) for RAG_DECOMPOSE
+export async function retrieveMultiQueryRRF(subQueries, userId, threadId, targetDocNames = [], topK = 4) {
+    const k = 60; // Standard RRF constant
+    const fusedScores = new Map(); // key: chunk.id -> { chunk, rrfScore }
+
+    await Promise.all(
+        subQueries.map(async (q) => {
+            const emb = await getEmbedding(q);
+            const results = await findRelevantChunks(emb, userId, threadId, 4, 0.35, targetDocNames);
+
+            results.forEach((chunk, rank) => {
+                const existing = fusedScores.get(chunk.id) || { chunk, rrfScore: 0 };
+                existing.rrfScore += 1 / (k + rank + 1);
+                // Keep the highest cosine score seen for display
+                if (chunk.score > existing.chunk.score) {
+                    existing.chunk.score = chunk.score;
+                }
+                fusedScores.set(chunk.id, existing);
+            });
+        })
+    );
+
+    return Array.from(fusedScores.values())
+        .sort((a, b) => b.rrfScore - a.rrfScore)
+        .slice(0, topK)
+        .map((item) => item.chunk);
+}
