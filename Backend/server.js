@@ -48,6 +48,13 @@ passport.deserializeUser(User.deserializeUser());
 app.use("/api", chatRoutes)
 app.use("/auth", userRoutes)
 app.use("/document", documentRoutes)
+
+app.get("/healthz", (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        uptime: process.uptime(),
+    });
+});
  
 app.all(/.*/, (req, res, next) => {
     next(new ExpressError(404, "page not found!"));

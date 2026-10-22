@@ -1,100 +1,112 @@
+# NovaChat — Production Upgrade & LangChain Architecture Plan
 
-
-## Phase 1 — Production Hardening (Highest Screening ROI)
-
-- [ ] **Security Headers:** Add `helmet` in `Backend/server.js`.
-- [ ] **Rate Limiting (`express-rate-limit`):** `POST /api/chat` (30/min/IP), `/auth/*` (10/min/IP), `POST /document/upload` (10/hr/IP).
-- [ ] **Input & Upload Validation (`zod` + `multer`):**
-  - Validate `POST /api/chat { threadId: z.string().uuid(), message: z.string().min(1).max(8000) }`.
-  - Harden `multer` in `Backend/routes/document.js`: `{ limits: { fileSize: 5 * 1024 * 1024, files: 1 }, fileFilter: PDF/TXT + magic-byte check }`.
-- [ ] **NoSQL Sanitization:** Add `express-mongo-sanitize` to strip `$` and `.` from user payloads.
-- [ ] **Session Persistence (`connect-mongo`):** Persist Express sessions in MongoDB instead of memory, enable `app.set("trust proxy", 1)`, configure dynamic CORS origin, and set `secure: process.env.NODE_ENV === "production"` on cookies.
-- [ ] **Compound Database Indexes:**
-  - `Thread`: `{ owner: 1, updatedAt: -1 }`
-  - `DocumentChunk`: `{ owner: 1, threadId: 1, docSummaryId: 1 }`
-- **Interview signal:** *"Hardened stateless API layer with persistent session store, strict schema validation, and bounded file ingestion."*
+**Execution Order:** Phase 3 & 4 (Core AI + Evals) ➔ Phase 1 (Hardening) ➔ Phase 2 (Docker + CI + Tests) ➔ Phase 5 & 6 (UX Polish + README Packaging + Freeze).
 
 ---
 
-## Phase 2 — Docker + Monorepo CI/CD + Automated Tests
+## Phase 1 — Production Security & Hardening (Highest Screening ROI)
 
-- [ ] **Containerization:** Create multi-stage `Dockerfile` for `Backend/` and `Frontend/` + root `docker-compose.yml` (`api`, `web`, `mongo`) for one-command `docker compose up --build`.
-- [ ] **Fix Monorepo GitHub Actions (`.github/workflows/ci.yml`):** Use `working-directory: ./Backend` and `working-directory: ./Frontend` so `npm ci`, `build`, and `test` target the correct `package.json` files.
-- [ ] **Targeted Test Suite (12 tests with `vitest` + `supertest`):**
-  - `RecursiveCharacterTextSplitter` / `chunkText` boundary & overlap tests.
-  - `cosineSimilarity` math & zero-vector edge cases.
-  - Auth guard: `401` on unauthenticated `GET /api/thread`.
-  - Upload guard: rejects >5MB and non-PDF/TXT payloads.
-  - Tenant isolation: User A cannot read or delete User B's `threadId`.
-- **Done when:** Fresh clone boots via `docker compose up`, GitHub Actions CI is green, and status badge is live in `README.md`.
-
----
-
-## Phase 3 — LangChain Core, Smart RAG Router & Evals (Your Technical Moat)
-
-- [ ] **LangChain Model Abstraction (`Backend/utils/langchainModels.js`):**
-  - Replace raw `fetch` in `llmServe.js` with `@langchain/google-genai` (`ChatGoogleGenerativeAI`) and `@langchain/groq` (`ChatGroq`) with automatic fallback and structured token caps.
-  - Replace custom `chunkText` in `ragUtils.js` with `@langchain/textsplitters` (`RecursiveCharacterTextSplitter` with `chunkSize: 800, chunkOverlap: 150`).
-  - Wrap `@huggingface/transformers` (`Xenova/all-MiniLM-L6-v2`) in a custom LangChain `Embeddings` class so local embeddings remain 100% free ($0 cost).
-- [ ] **Smart Multi-Doc Router (`Backend/utils/queryRouter.js`):**
-  - Use `model.withStructuredOutput(zodSchema)` over `query + thread.documents[].summary` to classify intent into:
-    - `DIRECT`: General chat or tool query -> skip document vector search (0ms vector overhead).
-    - `RAG_SINGLE`: Question targets specific uploaded file(s) -> filter `DocumentChunk` by selected `docSummaryId`s.
-    - `RAG_REWRITE`: Follow-up with pronouns (*"what does section 2 say about it?"*) -> rewrite standalone query using conversation history + doc summaries.
-    - `RAG_DECOMPOSE`: Complex multi-doc comparison -> generate 2–3 sub-queries, retrieve top-3 chunks each, and merge via **Reciprocal Rank Fusion (RRF)** + deduplication.
-- [ ] **Grounded Citations:**
-  - Emit structured SSE event `event: citations` containing `[{ id, docName, excerpt, score }]` alongside the stream.
-  - Render clickable citation pills in `Chat.jsx` to inspect the source chunk.
-- [ ] **Quantitative Evaluation (`EVAL.md`):**
-  - Benchmark 15 test queries (factual, follow-up paraphrase, multi-doc comparison, general chit-chat, and live web/weather queries).
-  - Report `Hit-Rate@3`, `MRR`, false-positive RAG trigger rate, and p50/p95 TTFT latency.
+- [ ] **Security & Sanitization Middleware (`Backend/server.js`):**
+  - Add `helmet()` for secure HTTP headers.
+  - Add `express-mongo-sanitize()` to strip `$` and `.` NoSQL injection payloads from `req.body`, `req.query`, and `req.params`.
+- [ ] **Route Rate Limiting (`express-rate-limit`):**
+  - `POST /api/chat`: `30 req / min / IP`
+  - `/auth/*`: `10 req / min / IP`
+  - `POST /document/upload`: `10 req / hr / IP`
+- [ ] **Strict Schema & Upload Validation (`zod` + `multer`):**
+  - Validate `POST /api/chat` body with Zod: `{ threadId: z.string().min(1), message: z.string().trim().min(1).max(8000) }`.
+  - Harden `multer` in `Backend/routes/document.js`:
+    - `limits: { fileSize: 5 * 1024 * 1024, files: 1 }` (5MB cap).
+    - `fileFilter`: allow only `.pdf` and `.txt` + verify PDF magic bytes (`%PDF-`) on buffer before parsing.
+- [ ] **Persistent Sessions (`connect-mongo`):**
+  - Store Express sessions in MongoDB (`MongoStore.create({ mongoUrl: process.env.LOCAL_MONGODB_URI })`).
+  - Set `app.set("trust proxy", 1)`, dynamic CORS origin, and `secure: process.env.NODE_ENV === "production"` on session cookies.
+- [ ] **Compound MongoDB Indexes:**
+  - `Backend/models/Thread.js`: `ThreadSchema.index({ owner: 1, updatedAt: -1 })`
+  - `Backend/models/DocumentChunk.js`: `documentChunkSchema.index({ owner: 1, threadId: 1, docSummaryId: 1 })`
 
 ---
 
-## Phase 4 — LangChain Multi-Tool Agent (Tavily Web Search + OpenWeather + RAG)
+## Phase 2 — Docker + Monorepo CI/CD + 12 Automated Tests
 
-- [ ] **Define Structured LangChain Tools (`Backend/utils/tools/`):**
-  1. **`tavilySearchTool.js` (`@langchain/tavily` or custom `tool()`):** Queries the **Tavily Search API** (`TAVILY_API_KEY`) for real-time news, live documentation, and current events.
-  2. **`weatherTool.js` (`tool()` with Zod schema `{ city: z.string(), units: z.enum(["metric", "imperial"]).optional() }`):** Calls **OpenWeatherMap API** (`OPENWEATHER_API_KEY`) to fetch live temperature, humidity, wind speed, and forecast conditions.
-  3. **`documentRetrievalTool.js` (Optional Agentic RAG binding):** Allows the agent to combine private PDF insights with live web/weather data in a single turn (e.g., *"Check our uploaded eventvenue.pdf and tell me the current weather in that city"*).
-- [ ] **Streaming Tool Execution Loop (`Backend/utils/agentExecutor.js`):**
-  - Bind tools via `llm.bindTools([tavilyTool, weatherTool])` (or `createReactAgent` via `@langchain/langgraph`).
-  - Stream intermediate SSE status events to the frontend:
-    - `event: tool_start` -> `data: { tool: "tavily_search", label: "Searching the web..." }`
-    - `event: tool_start` -> `data: { tool: "get_weather", label: "Fetching live weather for Delhi..." }`
-    - `event: tool_end` -> transitions seamlessly into `data: { content: "..." }` token streaming.
-  - Handle `req.on("close")` to abort in-flight LangChain `AbortSignal` if the client disconnects.
+- [ ] **Containerization (`Dockerfile` + `docker-compose.yml`):**
+  - Create multi-stage `Backend/Dockerfile` (Node 22 LTS slim) and `Frontend/Dockerfile` (Vite build ➔ Nginx alpine).
+  - Create root `docker-compose.yml` orchestrating `mongo`, `backend`, and `frontend` for one-command `docker compose up --build`.
+- [ ] **Fix Monorepo GitHub Actions (`.github/workflows/ci.yml`):**
+  - Configure `working-directory: ./Backend` and `working-directory: ./Frontend` on `ubuntu-latest` (Node 22.x) to run `npm ci`, `build`, and `test`.
+- [ ] **Write 12 High-Signal Tests (`vitest` + `supertest` in `Backend/tests/`):**
+  - **Tests 1–3 (`ragUtils.test.js`):** `chunkText` size/overlap boundaries, empty/short string filtering, `cosineSimilarity` identity (`1.0`), orthogonal (`0.0`), and zero-vector safety (`0`).
+  - **Tests 4–5 (`rrf.test.js`):** Deduplication of identical chunk IDs across sub-queries and RRF rank ordering.
+  - **Tests 6–7 (`auth.test.js`):** Unauthenticated `GET /api/thread` and `POST /api/chat` return `401 Unauthorized`.
+  - **Tests 8–10 (`validation.test.js`):** `POST /api/chat` rejects empty/oversized message (`400`); `POST /document/upload` rejects >5MB buffer (`413`/`400`) and non-PDF/TXT extension (`400`).
+  - **Tests 11–12 (`isolation.test.js`):** Tenant IDOR check — User A cannot `GET` or `DELETE` User B's `threadId` (`404`).
+
+---
+
+## Phase 3 — LangChain Core, Smart Multi-Doc RAG Router & Evals (Your Technical Moat)
+
+- [ ] **LangChain Model Factory (`Backend/utils/langchainModels.js`):**
+  - Integrate `@langchain/google-genai` (`ChatGoogleGenerativeAI`) for primary streaming/tool-calling and `@langchain/groq` (`ChatGroq`) for low-latency routing and summarization.
+- [ ] **Structure-Aware Chunking, Local Embeddings & RRF (`Backend/utils/ragUtils.js`):**
+  - Replace manual string slicing with `@langchain/textsplitters` (`RecursiveCharacterTextSplitter`, `chunkSize: 800, chunkOverlap: 150`).
+  - Keep $0 local 384-dim embeddings via `@huggingface/transformers` (`Xenova/all-MiniLM-L6-v2`).
+  - Implement `retrieveMultiQueryRRF` (Reciprocal Rank Fusion + chunk deduplication) and document-scoped filtering (`docName: { $in: targetDocNames }`).
+- [ ] **Zod-Structured Multi-Doc Query Router (`Backend/utils/queryRouter.js`):**
+  - Use `model.withStructuredOutput(RouteSchema)` over `userMessage + thread.documents[].summary + recentMessages` to classify intent into:
+    - `DIRECT`: General chat, coding, or external tool query ➔ skip vector search (0ms RAG overhead).
+    - `RAG_SINGLE`: Targets specific uploaded file(s) ➔ filter chunks by `targetDocNames`.
+    - `RAG_REWRITE`: Resolves conversational pronouns (*"what does section 2 say about it?"*) into a standalone search query.
+    - `RAG_DECOMPOSE`: Breaks multi-doc comparisons into 2–3 sub-queries and merges results with RRF.
+- [ ] **Structured SSE Citations (`Backend/controllers/Chats.js`):**
+  - Emit `event: citations` with `[{ id, docName, score, excerpt }]` prior to streaming assistant tokens.
+- [ ] **The 40-Query RAG & Router Eval Harness (`EVAL.md`):**
+  - Build `Backend/evals/dataset.json` across 3 distinct test PDFs (**10 Single-Doc Factual**, **8 Conversational Pronoun Follow-ups**, **8 Multi-Doc Comparisons**, **8 Direct/Weather/Tavily Queries**, **6 Unanswerable Traps**).
+  - Write `Backend/scripts/runEvals.js` comparing **Baseline (Naive Cosine Similarity)** vs. **NovaChat Pipeline (Zod Router + Rewrite + RRF)**.
+  - Log and publish in `EVAL.md`:
+    1. **Router Classification Accuracy (%)**
+    2. **Hit-Rate@3 (%)**
+    3. **Mean Reciprocal Rank (MRR@3)**
+    4. **Unanswerable Refusal / Groundedness Rate (%)**
+    5. **p50 / p95 TTFT Latency (ms)**
+
+---
+
+## Phase 4 — LangChain Multi-Tool Agent (Tavily Web Search + OpenWeather)
+
+- [ ] **Define Structured LangChain Tools (`Backend/utils/tools/index.js`):**
+  1. **`get_current_weather` (`weatherTool`):** Zod-validated tool calling **OpenWeatherMap API** (`OPENWEATHER_API_KEY`) for real-time temperature, feels-like, humidity, and wind speed.
+  2. **`web_search` (`tavilySearchTool`):** Zod-validated tool calling **Tavily Search API** (`TAVILY_API_KEY`) for live web search, news, and external documentation.
+- [ ] **Streaming Tool Execution Loop (`Backend/controllers/Chats.js`):**
+  - Bind tools via `getChatModel("gemini").bindTools(AGENT_TOOLS)`.
+  - Stream real-time SSE `event: status` updates (`"Analyzing query..."`, `"Searching documents..."`, `"Fetching live weather for..."`, `"Searching the web for..."`).
+  - Execute `tool_calls`, append `ToolMessage` results, and stream the synthesized final response.
+  - Handle client disconnects via `req.on("close", () => abortController.abort())`.
 
 ---
 
 ## Phase 5 — Senior Frontend UX Polish
 
-- [ ] **Live Tool & RAG Status Indicator (`ChatWindow.jsx` / `Chat.jsx`):** Render animated status pills (*"Searching web via Tavily..."*, *"Checking weather..."*, *"Reading report.pdf..."*) above the assistant message bubble before tokens arrive.
-- [ ] **Stream Controls:** Add `AbortController` "Stop Generating" button, "Regenerate" response button, and one-click "Copy Code" headers on syntax-highlighted code blocks.
-- [ ] **Thread Document Drawer:** Show attached `thread.documents` chips in the chat header with ability to view summary or remove a document from the thread, plus staged file attachment preview chip before sending.
-- [ ] **Toast Notifications:** Replace blocking browser `alert()` calls (`ChatWindow.jsx:194,221,224`) with `react-hot-toast` or `sonner`.
-- [ ] **Smart Auto-Scroll:** Smoothly stick to the bottom during SSE token streaming unless the user manually scrolls up.
+- [ ] **Live SSE Status & Citation Pills (`ChatWindow.jsx` & `Chat.jsx`):**
+  - Render animated status pill above the streaming response for router and tool steps.
+  - Render clickable `[Source 1: filename.pdf (0.64)]` citation pills beneath assistant messages that expand to reveal the source excerpt.
+- [ ] **Stream Controls & Code UX (`ChatWindow.jsx` & `Chat.jsx`):**
+  - Add client-side `AbortController` wired to a **Stop Generating** button while `loading === true`.
+  - Add one-click **Copy Code** button on `rehype-highlight` code blocks.
+- [ ] **Non-Blocking Notifications & Thread Doc Chips:**
+  - Replace browser `alert()` calls with toast notifications (`react-hot-toast` or `sonner`).
+  - Display active `thread.documents` badges in the chat header/input area.
 
 ---
 
-## Phase 6 — Observability, Cloud Deploy & Portfolio Packaging
+## Phase 6 — Observability, Portfolio Packaging & Code Freeze
 
-- [ ] **Structured Observability:** Add `pino` logger with `requestId` tracing and `GET /metrics` exposing p50/p95 TTFT latency, RAG hit-rate, and tool invocation counts.
-- [ ] **AWS EC2 + MongoDB Atlas Production Deploy:**
-  - Switch `LOCAL_MONGODB_URI` to MongoDB Atlas in production (enabling future `$vectorSearch` migration when chunk count exceeds 10k).
-  - Configure Nginx reverse proxy (`proxy_buffering off;` for SSE streaming) + PM2 + GitHub Actions CD workflow.
-- [ ] **Portfolio Artifacts:** Rewrite `README.md` with system architecture diagram, GIF demo of Multi-Doc RAG + Tavily/OpenWeather tool calling, and evaluation metrics table from `EVAL.md`.
+- [ ] **Observability Lite (`Backend/server.js`):**
+  - Add structured request logging (`pino` or request-duration middleware) and expose basic latency/RAG counters.
+- [ ] **High-Impact README & Demo Artifact (`README.md`):**
+  - Record a **45-second high-res GIF** demonstrating:
+    1. Uploading 2 PDFs to a thread and asking a cross-document comparison question (showing live status pill + RRF citations).
+    2. Asking a live weather + web search question in the same thread (showing the router bypassing PDF search and calling OpenWeather/Tavily).
+  - Embed the GIF, system architecture diagram, and the **`EVAL.md` benchmark comparison table** at the top of `README.md`.
+- [ ] **Freeze Codebase.**
 
 ---
-
-## Updated Tech Stack & Libraries Reference
-
-| Layer | Package | Purpose in NovaChat |
-| :--- | :--- | :--- |
-| **LLM & Orchestration** | `@langchain/core`, `@langchain/langgraph` | Unified message history, `bindTools`, structured outputs, and agent loop streaming. |
-| **Model Providers** | `@langchain/google-genai`, `@langchain/groq` | Primary streaming LLM (Gemini) + ultra-fast low-latency router/summarizer (Groq). |
-| **Text Processing** | `@langchain/textsplitters` | Structure-aware `RecursiveCharacterTextSplitter` for PDF/TXT ingestion. |
-| **Local Embeddings** | `@huggingface/transformers` | $0 local 384-dim embeddings (`Xenova/all-MiniLM-L6-v2`) wrapped in LangChain `Embeddings`. |
-| **Agent Tools** | `@langchain/tavily`, `OpenWeatherMap REST` | Live web search grounding and real-time meteorological data via tool calling. |
-| **Security & Validation** | `helmet`, `express-rate-limit`, `zod`, `connect-mongo` | Production API hardening, payload validation, and persistent MongoDB sessions. |
-| **Testing & Ops** | `vitest`, `supertest`, `pino`, `docker-compose` | Automated unit/integration testing, structured logging, and reproducible containers. |
