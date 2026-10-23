@@ -1,0 +1,1162 @@
+[
+  {
+    "id": "q01",
+    "category": "single_doc_factual",
+    "query": "How many paid casual leave days does each full-time employee get per year?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 11.162800000000061,
+      "ttftMs": 1814.2119000000002,
+      "answer": "Each full-time employee receives 18 paid casual days per calendar year.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 3471.7159,
+      "ttftMs": 4603.9965999999995,
+      "answer": "Based on the provided document, each full-time employee receives 18 paid casual days per calendar year.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q02",
+    "category": "single_doc_factual",
+    "query": "What is the daily meal allowance cap for business travel?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 49.80879999999888,
+      "ttftMs": 965.8321999999971,
+      "answer": "Based on the provided documents, the business travel meal allowance is capped at $75 per day.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 343.67099999999846,
+      "ttftMs": 1733.855899999995,
+      "answer": "Based on the provided document, the business travel meal allowance is capped at $75 per day.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q03",
+    "category": "single_doc_factual",
+    "query": "How many remote work days per quarter are employees allowed?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 70.53390000000218,
+      "ttftMs": 1803.3880999999965,
+      "answer": "Employees are allowed to work remotely for up to 15 remote work days per quarter.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 1282.4282999999996,
+      "ttftMs": 4319.099699999999,
+      "answer": "Employees may work remotely for up to 15 remote work days per quarter.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q04",
+    "category": "single_doc_factual",
+    "query": "What stipend is paid for a weekend on-call shift?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 49.963199999998324,
+      "ttftMs": 2377.9173999999985,
+      "answer": "Engineers on the on-call rotation receive a stipend of $250 per weekend shift.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 374.774599999997,
+      "ttftMs": 1557.6877999999997,
+      "answer": "Engineers on the on-call rotation receive a stipend of $250 per weekend shift.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q05",
+    "category": "single_doc_factual",
+    "query": "What is the Recovery Time Objective for the chat service?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 93.20709999999963,
+      "ttftMs": 1925.189400000003,
+      "answer": "Based on the provided documents, the Recovery Time Objective (RTO) for the chat service is 15 minutes.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 385.2065999999977,
+      "ttftMs": 1482.5990999999922,
+      "answer": "Based on the provided documents, the Recovery Time Objective (RTO) for the chat service is 15 minutes.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q06",
+    "category": "single_doc_factual",
+    "query": "How long is S3 backup retention set to?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 45.03139999999985,
+      "ttftMs": 810.2650999999969,
+      "answer": "Based on the provided documents, S3 backup retention is set to 90 days.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 762.1335999999937,
+      "ttftMs": 1606.5121,
+      "answer": "S3 backup retention is set to 90 days.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q07",
+    "category": "single_doc_factual",
+    "query": "What availability SLA does the MongoDB replica set have?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 49.4945000000007,
+      "ttftMs": 1078.7679000000062,
+      "answer": "The contractual availability SLA for the MongoDB replica set is 99.95% monthly uptime.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 385.2476000000024,
+      "ttftMs": 1692.1428000000014,
+      "answer": "Based on the provided documents, the contractual availability SLA for the MongoDB replica set is 99.95% monthly uptime.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q08",
+    "category": "single_doc_factual",
+    "query": "What is the chat model's context window limit per request?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 12.945000000006985,
+      "ttftMs": 798.3807000000088,
+      "answer": "128,000 tokens per request.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 1466.1858999999968,
+      "ttftMs": 2396.2994999999937,
+      "answer": "Based on the provided document, the chat model context window is limited to 128,000 tokens per request.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q09",
+    "category": "single_doc_factual",
+    "query": "What was the company's Q3 revenue?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 52.638999999995576,
+      "ttftMs": 757.6687999999995,
+      "answer": "$4.2M",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 381.15200000000186,
+      "ttftMs": 1134.955700000006,
+      "answer": "Q3 revenue was $4.2M.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q10",
+    "category": "single_doc_factual",
+    "query": "How much was spent on infrastructure in Q3?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 42.55419999999867,
+      "ttftMs": 1196.4465000000055,
+      "answer": "$1.8M",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 322.450800000006,
+      "ttftMs": 1361.7445000000007,
+      "answer": "Based on the provided documents, $1.8M was spent on infrastructure in Q3.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q11",
+    "category": "conversational_followup",
+    "query": "What about hotel stays?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 22.49560000000929,
+      "ttftMs": 890.0817000000097,
+      "answer": "Hotel stays are reimbursed up to $220 per night in Tier 1 cities and up to $160 per night elsewhere.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 337.2988999999943,
+      "ttftMs": 1292.926999999996,
+      "answer": "Hotel stays are reimbursed up to $220 per night in Tier 1 cities and up to $160 per night elsewhere.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q12",
+    "category": "conversational_followup",
+    "query": "And how many of those can roll over into the next year?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 45.67720000000554,
+      "ttftMs": 836.9048000000039,
+      "answer": "Up to 3 unused casual days may carry over into the next calendar year.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": false,
+      "reciprocalRank": 0,
+      "retrievalMs": 1411.707699999999,
+      "ttftMs": 3009.3099999999977,
+      "answer": "You cannot find it in the documents.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q13",
+    "category": "conversational_followup",
+    "query": "How quickly do they need to acknowledge the page?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 47.620999999999185,
+      "ttftMs": 814.622199999998,
+      "answer": "Engineers must acknowledge an on-call page within 10 minutes.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 331.1391000000003,
+      "ttftMs": 1006.177199999991,
+      "answer": "Engineers must acknowledge an on-call page within 10 minutes.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q14",
+    "category": "conversational_followup",
+    "query": "What is its recovery point objective?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 46.91769999999087,
+      "ttftMs": 900.9325999999855,
+      "answer": "The Recovery Point Objective (RPO) for MongoDB is 5 minutes.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 456.52090000000317,
+      "ttftMs": 1280.643700000015,
+      "answer": "The Recovery Point Objective (RPO) for MongoDB is 5 minutes.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q15",
+    "category": "conversational_followup",
+    "query": "What's the operating income from that?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 51.82850000000326,
+      "ttftMs": 658.4991000000155,
+      "answer": "Q3 operating income is $1.3M.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 361.26799999998184,
+      "ttftMs": 1221.3027999999758,
+      "answer": "Q3 operating income is $1.3M.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q16",
+    "category": "conversational_followup",
+    "query": "What response does a user get if they go over that?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 52.64329999999609,
+      "ttftMs": 1048.5654999999679,
+      "answer": "Requests above the chat limit receive HTTP 429 with a Retry-After header.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 443.10329999998794,
+      "ttftMs": 6136.287500000006,
+      "answer": "Requests above the chat limit receive HTTP 429 with a Retry-After header.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q17",
+    "category": "conversational_followup",
+    "query": "How does that compare to the previous quarter?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 85.83259999999427,
+      "ttftMs": 1100.6913999999815,
+      "answer": "The customer churn rate for Q3 (3.4%) is lower than the customer churn rate for Q2 (4.1%).",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 431.5828000000038,
+      "ttftMs": 1276.1119999999937,
+      "answer": "The customer churn rate for Q3 (3.4%) decreased compared to Q2 (4.1%).",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q18",
+    "category": "conversational_followup",
+    "query": "What is the deadline for submitting those requests?",
+    "expectedRoute": "RAG_REWRITE",
+    "route": "RAG_REWRITE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 71.18349999998463,
+      "ttftMs": 5268.041800000006,
+      "answer": "Remote work requests must be submitted through the HR portal at least 5 business days before the first requested day.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 330.23690000001807,
+      "ttftMs": 2128.104800000001,
+      "answer": "Remote work requests must be submitted through the HR portal at least 5 business days before the first requested day.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q19",
+    "category": "multi_doc_comparison",
+    "query": "What is the Q3 infrastructure cost, and how long is S3 backup retention?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 91.37040000001434,
+      "ttftMs": 937.85970000003,
+      "answer": "The Q3 infrastructure cost is $1.8M, and S3 backup retention is set to 90 days.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 467.24660000001313,
+      "ttftMs": 1240.9795000000158,
+      "answer": "Based on the provided documents:\n* Q3 infrastructure cost: $1.8M\n* S3 backup retention: 90 days",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q20",
+    "category": "multi_doc_comparison",
+    "query": "How many remote work days per quarter are allowed, and what is the RTO for the chat service?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 13.261899999983143,
+      "ttftMs": 1957.7971999999718,
+      "answer": "Based on the provided documents:\n* Employees may work remotely for up to **15 remote work days per quarter**.\n* The Recovery Time Objective (RTO) for the chat service is **15 minutes**.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": false,
+      "reciprocalRank": 0,
+      "retrievalMs": 443.7674999999872,
+      "ttftMs": 1540.6695999999938,
+      "answer": "Employees may work remotely for up to 15 remote work days per quarter. \n\nThe provided documents do not contain the Recovery Time Objective (RTO) for the chat service.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q21",
+    "category": "multi_doc_comparison",
+    "query": "What is the meal allowance cap, and what were the total Q3 operating costs?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 12.81919999999809,
+      "ttftMs": 1520.4847999999765,
+      "answer": "The business travel meal allowance cap is $75 per day. \nThe total operating costs for Q3 were $2.9M.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": false,
+      "reciprocalRank": 0,
+      "retrievalMs": 397.92739999998594,
+      "ttftMs": 966.0585999999603,
+      "answer": "Total operating costs for Q3 were $2.9M. The documents do not contain information about a meal allowance cap.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q22",
+    "category": "multi_doc_comparison",
+    "query": "What was the Q3 churn rate, and what is the MongoDB replica set SLA?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 39.745799999975134,
+      "ttftMs": 795.4469999999565,
+      "answer": "Based on the provided documents:\n* The customer churn rate for Q3 is 3.4%.\n* The contractual availability SLA for the MongoDB replica set is 99.95% monthly uptime.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 754.8328000000038,
+      "ttftMs": 2334.330499999982,
+      "answer": "Based on the provided documents:\n\n* The customer churn rate for Q3 was 3.4%.\n* The contractual availability SLA for the MongoDB replica set is 99.95% monthly uptime.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q23",
+    "category": "multi_doc_comparison",
+    "query": "How many unused casual leave days can carry over, and how long are S3 backups kept?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 1,
+      "retrievalMs": 20.872099999978673,
+      "ttftMs": 874.6752999999735,
+      "answer": "Up to 3 unused casual days may carry over into the next calendar year. S3 backups are kept for 90 days.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 417.20530000000144,
+      "ttftMs": 1865.328999999998,
+      "answer": "Based on the provided documents:\n\n* Up to 3 unused casual days may carry over into the next calendar year.\n* S3 backups are kept for 90 days (backup retention is set to 90 days).",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q24",
+    "category": "multi_doc_comparison",
+    "query": "How many recent messages are kept verbatim, and what was Q2 revenue?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 17.338999999978114,
+      "ttftMs": 822.941199999972,
+      "answer": "The recent message window includes the last 20 messages verbatim, and Q2 revenue was $3.6M.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": false,
+      "reciprocalRank": 0,
+      "retrievalMs": 409.8715000000084,
+      "ttftMs": 1618.8887000000104,
+      "answer": "I cannot find the number of recent messages kept verbatim in the documents. \n\nQ2 revenue was $3.6M.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q25",
+    "category": "multi_doc_comparison",
+    "query": "What is the Q4 enterprise sales target, and how many paid sick days do employees get?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 12.451800000009825,
+      "ttftMs": 804.3047000000079,
+      "answer": "The Q4 enterprise sales target (projected) is $5.5M. Full-time employees receive 10 paid sick days per calendar year.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.5,
+      "retrievalMs": 405.7792999999947,
+      "ttftMs": 1304.9451000000117,
+      "answer": "- Q4 enterprise sales target (projected): $5.5M\n- Paid sick days: Each full-time employee receives 10 paid sick days per calendar year.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q26",
+    "category": "multi_doc_comparison",
+    "query": "What is the disaster recovery RTO, and what is the on-call stipend for a weekday shift?",
+    "expectedRoute": "RAG_DECOMPOSE",
+    "route": "RAG_DECOMPOSE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": false,
+      "reciprocalRank": 0,
+      "retrievalMs": 10.994399999995949,
+      "ttftMs": 984.1475999999966,
+      "answer": "Based on the provided documents:\n* The RTO (Recovery Time Objective) is not mentioned (the documents only state that the MongoDB Recovery Point Objective / RPO is 5 minutes).\n* The weekday on-call shift stipend is $80 per shift.",
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 3,
+      "hit": true,
+      "reciprocalRank": 0.3333333333333333,
+      "retrievalMs": 399.56750000000466,
+      "ttftMs": 1034.2498999999953,
+      "answer": "Based on the provided documents:\n* The Recovery Time Objective (RTO) for the chat service is 15 minutes.\n* The on-call stipend for a weekday shift is $80 per shift.",
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q27",
+    "category": "direct_tool",
+    "query": "What's the weather in Delhi right now?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 9.119100000010803,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 1621.7939999999944,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q28",
+    "category": "direct_tool",
+    "query": "Will it rain in Bengaluru tomorrow?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 46.19949999998789,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 299.278100000025,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q29",
+    "category": "direct_tool",
+    "query": "What is the current weather in London?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 44.83280000000377,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 305.53979999999865,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q30",
+    "category": "direct_tool",
+    "query": "What's the latest news about Anthropic's Claude models?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 91.4549999999872,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 341.26090000002296,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q31",
+    "category": "direct_tool",
+    "query": "Search the web for the current Gemini API free tier rate limits.",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 77.98239999997895,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 389.87100000001374,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q32",
+    "category": "direct_tool",
+    "query": "Hi, can you introduce yourself?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 2,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 47.87889999998151,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 490.12349999998696,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q33",
+    "category": "direct_tool",
+    "query": "What's 15 percent of 2,400?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 75.41169999999693,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 270.7078000000038,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q34",
+    "category": "direct_tool",
+    "query": "What's the temperature in Mumbai at the moment?",
+    "expectedRoute": "DIRECT",
+    "route": "DIRECT",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 53.88719999999739,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 268.2394000000204,
+      "ttftMs": null,
+      "answer": null,
+      "refused": null,
+      "suppressed": null
+    }
+  },
+  {
+    "id": "q35",
+    "category": "unanswerable_trap",
+    "query": "What is the parental leave policy?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 41.43260000000009,
+      "ttftMs": 783.9698000000208,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 303.65789999999106,
+      "ttftMs": 1700.460299999977,
+      "answer": "I cannot find it in the documents.",
+      "refused": true,
+      "suppressed": true
+    }
+  },
+  {
+    "id": "q36",
+    "category": "unanswerable_trap",
+    "query": "What was the actual Q4 revenue?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 88.87249999999767,
+      "ttftMs": 854.0277999999817,
+      "answer": "Q4 actual results are not included in this report (the Q4 figure provided is a projection of enterprise sales).",
+      "refused": true,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 7478.5196,
+      "ttftMs": 8433.411999999953,
+      "answer": "Q4 actual results are not included in this report.",
+      "refused": true,
+      "suppressed": false
+    }
+  },
+  {
+    "id": "q37",
+    "category": "unanswerable_trap",
+    "query": "Who is the CEO of Northwind Labs?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "DIRECT",
+    "routerCorrect": false,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 80.7101000000257,
+      "ttftMs": 837.0918000000529,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 636.8338999999687,
+      "ttftMs": 1890.7736999999615,
+      "answer": "I cannot find it in the documents.",
+      "refused": true,
+      "suppressed": true
+    }
+  },
+  {
+    "id": "q38",
+    "category": "unanswerable_trap",
+    "query": "How many nodes are in the Redis cluster?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 65.72379999997793,
+      "ttftMs": 851.8434000000125,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 0,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 394.43780000001425,
+      "ttftMs": 1041.8588000000454,
+      "answer": "I cannot find it in the documents.",
+      "refused": true,
+      "suppressed": true
+    }
+  },
+  {
+    "id": "q39",
+    "category": "unanswerable_trap",
+    "query": "What is the hotel cap for Tier 2 cities?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 50.92149999999674,
+      "ttftMs": 817.6362000000081,
+      "answer": "Based on the provided documents, hotel stays are reimbursed up to $160 per night elsewhere (which applies to non-Tier 1 cities).",
+      "refused": false,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 1,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 724.0865999999805,
+      "ttftMs": 1484.0189000000246,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    }
+  },
+  {
+    "id": "q40",
+    "category": "unanswerable_trap",
+    "query": "What is the remote work policy for contractors?",
+    "expectedRoute": "RAG_SINGLE",
+    "route": "RAG_SINGLE",
+    "routerCorrect": true,
+    "routerError": null,
+    "baseline": {
+      "chunksReturned": 3,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 49.568700000003446,
+      "ttftMs": 1183.4168000000063,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    },
+    "upgraded": {
+      "chunksReturned": 2,
+      "hit": null,
+      "reciprocalRank": null,
+      "retrievalMs": 362.74110000004293,
+      "ttftMs": 1867.3907000000472,
+      "answer": "You cannot find it in the documents.",
+      "refused": true,
+      "suppressed": false
+    }
+  }
+]

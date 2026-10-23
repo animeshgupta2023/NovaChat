@@ -1,0 +1,386 @@
+[
+  {
+    "id": "q01",
+    "category": "single_doc_factual",
+    "query": "How many paid casual leave days does each full-time employee get per year?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["18", "casual"]
+  },
+  {
+    "id": "q02",
+    "category": "single_doc_factual",
+    "query": "What is the daily meal allowance cap for business travel?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["$75", "meal"]
+  },
+  {
+    "id": "q03",
+    "category": "single_doc_factual",
+    "query": "How many remote work days per quarter are employees allowed?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["15", "remote"]
+  },
+  {
+    "id": "q04",
+    "category": "single_doc_factual",
+    "query": "What stipend is paid for a weekend on-call shift?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["$250", "weekend"]
+  },
+  {
+    "id": "q05",
+    "category": "single_doc_factual",
+    "query": "What is the Recovery Time Objective for the chat service?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["15 minutes", "Recovery Time Objective"]
+  },
+  {
+    "id": "q06",
+    "category": "single_doc_factual",
+    "query": "How long is S3 backup retention set to?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["90 days", "retention"]
+  },
+  {
+    "id": "q07",
+    "category": "single_doc_factual",
+    "query": "What availability SLA does the MongoDB replica set have?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["99.95%"]
+  },
+  {
+    "id": "q08",
+    "category": "single_doc_factual",
+    "query": "What is the chat model's context window limit per request?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["128,000"]
+  },
+  {
+    "id": "q09",
+    "category": "single_doc_factual",
+    "query": "What was the company's Q3 revenue?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["quarterly_financials.txt"],
+    "groundTruthKeywords": ["$4.2M", "Q3"]
+  },
+  {
+    "id": "q10",
+    "category": "single_doc_factual",
+    "query": "How much was spent on infrastructure in Q3?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["quarterly_financials.txt"],
+    "groundTruthKeywords": ["$1.8M", "Infrastructure"]
+  },
+  {
+    "id": "q11",
+    "category": "conversational_followup",
+    "query": "What about hotel stays?",
+    "history": [
+      { "role": "user", "content": "What is the meal allowance cap for business travel?" },
+      { "role": "assistant", "content": "Business travel meals are capped at $75 per day. Meals above this cap are not reimbursed." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["$220", "Tier 1"]
+  },
+  {
+    "id": "q12",
+    "category": "conversational_followup",
+    "query": "And how many of those can roll over into the next year?",
+    "history": [
+      { "role": "user", "content": "How many paid casual leave days does each employee get per year?" },
+      { "role": "assistant", "content": "Each full-time employee receives 18 paid casual days per calendar year." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["3", "carry over"]
+  },
+  {
+    "id": "q13",
+    "category": "conversational_followup",
+    "query": "How quickly do they need to acknowledge the page?",
+    "history": [
+      { "role": "user", "content": "What stipend is paid for a weekend on-call shift?" },
+      { "role": "assistant", "content": "Engineers on the on-call rotation receive a stipend of $250 per weekend shift." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["10 minutes"]
+  },
+  {
+    "id": "q14",
+    "category": "conversational_followup",
+    "query": "What is its recovery point objective?",
+    "history": [
+      { "role": "user", "content": "What is the Recovery Time Objective for the chat service?" },
+      { "role": "assistant", "content": "The Recovery Time Objective for the chat service is 15 minutes." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["5 minutes", "Recovery Point Objective"]
+  },
+  {
+    "id": "q15",
+    "category": "conversational_followup",
+    "query": "What's the operating income from that?",
+    "history": [
+      { "role": "user", "content": "What were the total operating costs for Q3?" },
+      { "role": "assistant", "content": "Total operating costs for Q3 were $2.9M, including $1.8M for infrastructure and $1.1M for R&D." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["quarterly_financials.txt"],
+    "groundTruthKeywords": ["$1.3M"]
+  },
+  {
+    "id": "q16",
+    "category": "conversational_followup",
+    "query": "What response does a user get if they go over that?",
+    "history": [
+      { "role": "user", "content": "What is the chat endpoint rate limit?" },
+      { "role": "assistant", "content": "The Redis-backed rate limit for the chat endpoint is 30 requests per minute per user." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": ["429", "Retry-After"]
+  },
+  {
+    "id": "q17",
+    "category": "conversational_followup",
+    "query": "How does that compare to the previous quarter?",
+    "history": [
+      { "role": "user", "content": "What is the customer churn rate for Q3?" },
+      { "role": "assistant", "content": "The customer churn rate for Q3 is 3.4%." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["quarterly_financials.txt"],
+    "groundTruthKeywords": ["4.1%"]
+  },
+  {
+    "id": "q18",
+    "category": "conversational_followup",
+    "query": "What is the deadline for submitting those requests?",
+    "history": [
+      { "role": "user", "content": "How many remote work days per quarter are employees allowed?" },
+      { "role": "assistant", "content": "Employees may work remotely for up to 15 remote work days per quarter, with manager approval for each day." }
+    ],
+    "expectedRoute": "RAG_REWRITE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": ["5 business days"]
+  },
+  {
+    "id": "q19",
+    "category": "multi_doc_comparison",
+    "query": "What is the Q3 infrastructure cost, and how long is S3 backup retention?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["quarterly_financials.txt", "system_architecture.txt"],
+    "groundTruthKeywords": ["$1.8M", "90 days"]
+  },
+  {
+    "id": "q20",
+    "category": "multi_doc_comparison",
+    "query": "How many remote work days per quarter are allowed, and what is the RTO for the chat service?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["company_policy.txt", "system_architecture.txt"],
+    "groundTruthKeywords": ["15", "15 minutes"]
+  },
+  {
+    "id": "q21",
+    "category": "multi_doc_comparison",
+    "query": "What is the meal allowance cap, and what were the total Q3 operating costs?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["company_policy.txt", "quarterly_financials.txt"],
+    "groundTruthKeywords": ["$75", "$2.9M"]
+  },
+  {
+    "id": "q22",
+    "category": "multi_doc_comparison",
+    "query": "What was the Q3 churn rate, and what is the MongoDB replica set SLA?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["quarterly_financials.txt", "system_architecture.txt"],
+    "groundTruthKeywords": ["3.4%", "99.95%"]
+  },
+  {
+    "id": "q23",
+    "category": "multi_doc_comparison",
+    "query": "How many unused casual leave days can carry over, and how long are S3 backups kept?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["company_policy.txt", "system_architecture.txt"],
+    "groundTruthKeywords": ["3", "90 days"]
+  },
+  {
+    "id": "q24",
+    "category": "multi_doc_comparison",
+    "query": "How many recent messages are kept verbatim, and what was Q2 revenue?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["system_architecture.txt", "quarterly_financials.txt"],
+    "groundTruthKeywords": ["20 messages", "$3.6M"]
+  },
+  {
+    "id": "q25",
+    "category": "multi_doc_comparison",
+    "query": "What is the Q4 enterprise sales target, and how many paid sick days do employees get?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["quarterly_financials.txt", "company_policy.txt"],
+    "groundTruthKeywords": ["$5.5M", "10 paid sick days"]
+  },
+  {
+    "id": "q26",
+    "category": "multi_doc_comparison",
+    "query": "What is the disaster recovery RTO, and what is the on-call stipend for a weekday shift?",
+    "history": [],
+    "expectedRoute": "RAG_DECOMPOSE",
+    "targetDocs": ["system_architecture.txt", "company_policy.txt"],
+    "groundTruthKeywords": ["15 minutes", "$80"]
+  },
+  {
+    "id": "q27",
+    "category": "direct_tool",
+    "query": "What's the weather in Delhi right now?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q28",
+    "category": "direct_tool",
+    "query": "Will it rain in Bengaluru tomorrow?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q29",
+    "category": "direct_tool",
+    "query": "What is the current weather in London?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q30",
+    "category": "direct_tool",
+    "query": "What's the latest news about Anthropic's Claude models?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q31",
+    "category": "direct_tool",
+    "query": "Search the web for the current Gemini API free tier rate limits.",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q32",
+    "category": "direct_tool",
+    "query": "Hi, can you introduce yourself?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q33",
+    "category": "direct_tool",
+    "query": "What's 15 percent of 2,400?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q34",
+    "category": "direct_tool",
+    "query": "What's the temperature in Mumbai at the moment?",
+    "history": [],
+    "expectedRoute": "DIRECT",
+    "targetDocs": [],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q35",
+    "category": "unanswerable_trap",
+    "query": "What is the parental leave policy?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q36",
+    "category": "unanswerable_trap",
+    "query": "What was the actual Q4 revenue?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["quarterly_financials.txt"],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q37",
+    "category": "unanswerable_trap",
+    "query": "Who is the CEO of Northwind Labs?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q38",
+    "category": "unanswerable_trap",
+    "query": "How many nodes are in the Redis cluster?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["system_architecture.txt"],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q39",
+    "category": "unanswerable_trap",
+    "query": "What is the hotel cap for Tier 2 cities?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": []
+  },
+  {
+    "id": "q40",
+    "category": "unanswerable_trap",
+    "query": "What is the remote work policy for contractors?",
+    "history": [],
+    "expectedRoute": "RAG_SINGLE",
+    "targetDocs": ["company_policy.txt"],
+    "groundTruthKeywords": []
+  }
+]

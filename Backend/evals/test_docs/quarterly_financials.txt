@@ -1,0 +1,37 @@
+NORTHWIND LABS - FISCAL YEAR 2026 QUARTERLY FINANCIAL REPORT
+Prepared by: Finance
+Reporting period: Fiscal year 2026 (1 January to 31 December 2026)
+
+1. SUMMARY
+
+Revenue grew across the fiscal year. Q3 was the strongest quarter to date, and the company entered Q4 with an enterprise sales target that would exceed every prior quarter.
+
+2. QUARTERLY REVENUE
+
+Q1 revenue: $3.1M
+Q2 revenue: $3.6M
+Q3 revenue: $4.2M
+Q4 enterprise sales target (projected): $5.5M
+
+The Q4 figure is a projection of enterprise sales. Q4 actual results are not included in this report.
+
+3. OPERATING COSTS - Q3
+
+Total operating costs for Q3: $2.9M
+  - Infrastructure: $1.8M (cloud hosting, database clusters, object storage, and CDN)
+  - Research and development: $1.1M
+
+Q3 operating income, calculated as Q3 revenue minus total operating costs, is $1.3M.
+
+4. CUSTOMER METRICS
+
+Customer churn rate for Q3: 3.4%.
+Customer churn rate for Q2: 4.1%.
+
+5. NOTES ON INFRASTRUCTURE SPEND
+
+Infrastructure spend rose about 12% quarter over quarter in Q3. The increase came from additional database replica capacity and growth in stored object data. Finance expects infrastructure spend to remain near the Q3 level through Q4.
+
+6. PREPARED BY
+
+Questions about this report should be directed to the Finance team at finance@northwindlabs.example.

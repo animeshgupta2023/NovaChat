@@ -1,0 +1,51 @@
+NOVACHAT PLATFORM - SYSTEM ARCHITECTURE AND OPERATIONS SPECIFICATION
+Document ID: SA-SPEC-2026-03
+Version 2.1, revised 12 September 2026
+
+1. OVERVIEW
+
+NovaChat is deployed as a set of microservices: an API gateway, a chat service, a document ingestion service, a retrieval service, and a background summarization worker. Services communicate over HTTP and through an internal message queue.
+
+2. DATA STORES
+
+2.1 MongoDB runs as a three-member replica set with automatic failover. The contractual availability SLA for the replica set is 99.95% monthly uptime.
+
+2.2 Redis is used for rate-limit counters and short-lived session caching.
+
+2.3 Amazon S3 holds raw uploaded documents and nightly database snapshots.
+
+3. BACKUP AND RETENTION
+
+3.1 S3 backup retention is set to 90 days. A lifecycle policy deletes backup objects once they are older than 90 days.
+
+3.2 Nightly MongoDB snapshots are taken at 02:00 UTC.
+
+3.3 Backups are encrypted at rest with AES-256.
+
+4. RATE LIMITING
+
+4.1 The Redis-backed rate limit for the chat endpoint is 30 requests per minute per user.
+
+4.2 Requests above the chat limit receive HTTP 429 with a Retry-After header.
+
+4.3 The document upload endpoint allows 10 uploads per hour per IP address.
+
+5. TOKEN CONTEXT LIMITS
+
+5.1 The chat model context window is limited to 128,000 tokens per request.
+
+5.2 The recent message window includes the last 20 messages verbatim. Older messages are summarized in batches.
+
+5.3 Retrieved document context is capped at 4 chunks per request, with each chunk approximately 1,000 characters long.
+
+6. DISASTER RECOVERY
+
+6.1 The Recovery Time Objective (RTO) for the chat service is 15 minutes.
+
+6.2 The Recovery Point Objective (RPO) for MongoDB is 5 minutes, achieved through continuous oplog shipping.
+
+6.3 Disaster recovery failover is initiated by the on-call site reliability engineer. DR failover is tested once per quarter.
+
+7. OWNERSHIP
+
+The platform team owns the API gateway, chat service, and retrieval service. The data team owns the document ingestion service and the summarization worker.

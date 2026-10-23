@@ -45,20 +45,6 @@
 
 ## Phase 3 — LangChain Core, Smart Multi-Doc RAG Router & Evals (Your Technical Moat)
 
-- [ ] **LangChain Model Factory (`Backend/utils/langchainModels.js`):**
-  - Integrate `@langchain/google-genai` (`ChatGoogleGenerativeAI`) for primary streaming/tool-calling and `@langchain/groq` (`ChatGroq`) for low-latency routing and summarization.
-- [ ] **Structure-Aware Chunking, Local Embeddings & RRF (`Backend/utils/ragUtils.js`):**
-  - Replace manual string slicing with `@langchain/textsplitters` (`RecursiveCharacterTextSplitter`, `chunkSize: 800, chunkOverlap: 150`).
-  - Keep $0 local 384-dim embeddings via `@huggingface/transformers` (`Xenova/all-MiniLM-L6-v2`).
-  - Implement `retrieveMultiQueryRRF` (Reciprocal Rank Fusion + chunk deduplication) and document-scoped filtering (`docName: { $in: targetDocNames }`).
-- [ ] **Zod-Structured Multi-Doc Query Router (`Backend/utils/queryRouter.js`):**
-  - Use `model.withStructuredOutput(RouteSchema)` over `userMessage + thread.documents[].summary + recentMessages` to classify intent into:
-    - `DIRECT`: General chat, coding, or external tool query ➔ skip vector search (0ms RAG overhead).
-    - `RAG_SINGLE`: Targets specific uploaded file(s) ➔ filter chunks by `targetDocNames`.
-    - `RAG_REWRITE`: Resolves conversational pronouns (*"what does section 2 say about it?"*) into a standalone search query.
-    - `RAG_DECOMPOSE`: Breaks multi-doc comparisons into 2–3 sub-queries and merges results with RRF.
-- [ ] **Structured SSE Citations (`Backend/controllers/Chats.js`):**
-  - Emit `event: citations` with `[{ id, docName, score, excerpt }]` prior to streaming assistant tokens.
 - [ ] **The 40-Query RAG & Router Eval Harness (`EVAL.md`):**
   - Build `Backend/evals/dataset.json` across 3 distinct test PDFs (**10 Single-Doc Factual**, **8 Conversational Pronoun Follow-ups**, **8 Multi-Doc Comparisons**, **8 Direct/Weather/Tavily Queries**, **6 Unanswerable Traps**).
   - Write `Backend/scripts/runEvals.js` comparing **Baseline (Naive Cosine Similarity)** vs. **NovaChat Pipeline (Zod Router + Rewrite + RRF)**.
@@ -73,13 +59,7 @@
 
 ## Phase 4 — LangChain Multi-Tool Agent (Tavily Web Search + OpenWeather)
 
-- [ ] **Define Structured LangChain Tools (`Backend/utils/tools/index.js`):**
-  1. **`get_current_weather` (`weatherTool`):** Zod-validated tool calling **OpenWeatherMap API** (`OPENWEATHER_API_KEY`) for real-time temperature, feels-like, humidity, and wind speed.
-  2. **`web_search` (`tavilySearchTool`):** Zod-validated tool calling **Tavily Search API** (`TAVILY_API_KEY`) for live web search, news, and external documentation.
-- [ ] **Streaming Tool Execution Loop (`Backend/controllers/Chats.js`):**
-  - Bind tools via `getChatModel("gemini").bindTools(AGENT_TOOLS)`.
-  - Stream real-time SSE `event: status` updates (`"Analyzing query..."`, `"Searching documents..."`, `"Fetching live weather for..."`, `"Searching the web for..."`).
-  - Execute `tool_calls`, append `ToolMessage` results, and stream the synthesized final response.
+ 
   - Handle client disconnects via `req.on("close", () => abortController.abort())`.
 
 ---

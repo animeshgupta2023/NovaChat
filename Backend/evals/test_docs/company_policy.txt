@@ -1,0 +1,52 @@
+NORTHWIND LABS - EMPLOYEE HANDBOOK EXCERPT (HR POLICIES)
+Document ID: HR-POL-2026-01
+Effective date: 1 April 2026
+Owner: Human Resources
+
+1. LEAVE ALLOCATIONS
+
+1.1 Paid casual leave. Each full-time employee receives 18 paid casual days per calendar year. Casual leave accrues at 1.5 days per month. Up to 3 unused casual days may carry over into the next calendar year; any remainder expires on 31 December.
+
+1.2 Sick leave. Each full-time employee receives 10 paid sick days per calendar year. A medical certificate is required for any sick absence longer than 2 consecutive working days.
+
+1.3 Earned leave. Each full-time employee accrues 15 earned leave days per year. Up to 30 earned leave days may be carried forward.
+
+2. REMOTE WORK
+
+2.1 Employees may work remotely for up to 15 remote work days per quarter. Each remote day requires manager approval.
+
+2.2 Remote work requests must be submitted through the HR portal at least 5 business days before the first requested day.
+
+2.3 Roles classified as on-site only, including warehouse operations and laboratory technicians, are not eligible for remote work.
+
+3. EXPENSE REIMBURSEMENT
+
+3.1 Business travel meal allowance is capped at $75 per day. Meals above this cap are not reimbursed.
+
+3.2 Hotel stays are reimbursed up to $220 per night in Tier 1 cities and up to $160 per night elsewhere.
+
+3.3 A receipt is required for every expense above $25. Expense claims must be submitted within 30 days of the end of the trip.
+
+3.4 Use of a personal vehicle for business is reimbursed at $0.60 per mile.
+
+4. ON-CALL ROTATION
+
+4.1 Engineers on the on-call rotation receive a stipend of $250 per weekend shift.
+
+4.2 Weekday on-call shifts receive a stipend of $80 per shift.
+
+4.3 Engineers must acknowledge an on-call page within 10 minutes.
+
+5. DISCIPLINARY STEPS FOR UNAPPROVED ABSENCES
+
+5.1 First unapproved absence: a written warning is recorded in the employee's personnel file.
+
+5.2 Second unapproved absence within any rolling 12-month period: a final written warning and a performance improvement plan.
+
+5.3 Third unapproved absence within any rolling 12-month period: a termination review conducted by HR and the employee's department head.
+
+5.4 An absence of three or more consecutive working days without contact may be treated as voluntary resignation, but only after written notice has been sent to the employee's last known address and email.
+
+6. CONTACT
+
+Questions about this policy should be sent to hr@northwindlabs.example.

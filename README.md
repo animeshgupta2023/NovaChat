@@ -138,6 +138,27 @@ npm run build
 
 There is no automated backend test script configured yet. `Backend/test.js` is a standalone NVIDIA API connectivity check and requires `NVIDIA_API_KEY`; it is not an application test suite.
 
+## RAG Evaluation
+
+The repository includes a 40-query evaluation dataset and a runner that compares basic cosine retrieval against the router-based RAG pipeline. Run it from the backend directory:
+
+```bash
+cd Backend
+node scripts/runEvals.js
+```
+
+The runner requires `LOCAL_MONGODB_URI` and a model API key for routing and answer generation. It seeds a dedicated evaluation thread and replaces its existing chunks each run. Set `EVAL_SKIP_GENERATION=1` to skip answer generation; routing and retrieval still run, so this does not eliminate model API usage. Results are written to `Backend/evals/results.json` and the summary report to `EVAL.md`.
+
+Metrics are checks against the dataset's expected routes and retrieval keywords, not independent proof that every generated answer is correct:
+
+- **Router accuracy** compares the route selected by the model with the dataset's `expectedRoute`.
+- **Hit-Rate@3** checks whether retrieved top-three chunks contain the expected keywords. Multi-document questions require all keywords across the top three.
+- **MRR@3** rewards relevant chunks appearing nearer the top; misses score zero.
+- **Retrieval suppression and refusal rate** measure whether unanswerable questions return no chunks and whether generated answers match a refusal-phrase pattern. Phrase matching is approximate.
+- **Retrieval latency and TTFT** are timings from that run and machine. TTFT includes retrieval plus generation time to the first token.
+
+For correctness, inspect the per-query routes, scores, and generated answers in `Backend/evals/results.json`; compare answers with the source files in `Backend/evals/test_docs/`; and review whether the expected routes and keywords in `Backend/evals/dataset.json` are appropriate. The result file does not include the retrieved chunk text, so reproduce retrieval or inspect the source documents when investigating a retrieval miss. The report is useful for comparing changes under the same setup, but its scores depend on this small hand-authored dataset and are not a substitute for manual review.
+
 ## API
 
 Authentication endpoints are mounted under `/auth`. Chat routes are mounted under `/api`; document routes are mounted under `/document`. Protected endpoints require the session cookie established by login or signup.
@@ -199,7 +220,7 @@ Thread and document chunk queries are scoped to the authenticated owner; chunk r
 - PDF extraction is text-based; scanned documents need OCR. Upload validation and limits are not yet enforced server-side.
 - Citation metadata is emitted by the backend but is not yet presented as an inspectable source UI. The model's prose citations are not independently validated.
 - Session storage, rate limiting, input validation, production CORS/cookie configuration, and automated backend tests need hardening before a public deployment.
-- The planned work is tracked in [`plan/upgrade.md`](plan/upgrade.md). It includes production hardening, tests and containerization, retrieval evaluation, citation UX, observability, and deployment work. Those items are plans, not claims about current functionality.
+- The planned work is tracked in [`plan/upgrade.md`](plan/upgrade.md). It includes production hardening, tests and containerization, further retrieval evaluation, citation UX, observability, and deployment work. Those items are plans, not claims about current functionality.
 
 ## Project Structure
 
