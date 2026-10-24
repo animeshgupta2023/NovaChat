@@ -144,6 +144,7 @@ const chat = async (req, res) => {
             console.log("[RAG Router]:", routeDecision);
 
             if (routeDecision.route !== "DIRECT") {
+                sendSSE(res, "status", { label: "Analying query" });
                 const queries =
                     routeDecision.searchQueries?.length > 0
                         ? routeDecision.searchQueries
