@@ -23,13 +23,13 @@ const DocumentMetaSchema = new mongoose.Schema({
     },
     summary: {
         type: String,
-        required: true,
+        default: "",
     },
     uploadedAt: {
         type: Date,
         default: Date.now,
-    }
-})
+    } 
+}) 
 
 const ThreadSchema = new mongoose.Schema({
     threadId: {

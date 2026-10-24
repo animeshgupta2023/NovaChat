@@ -13,13 +13,14 @@ import documentRoutes from "./routes/document.js"
 import ExpressError from "./utils/ExpressError.js"
 
 const app = express()
-const PORT = 8080
+const PORT = process.env.PORT || 8080
 
+app.set("trust proxy", 1);
 app.use(express.json())  
 
-
+const allowedOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 app.use(cors({
-        origin: "http://localhost:5173", // swap with the actual production link
+        origin: process.env.NODE_ENV === "production" ? true : allowedOrigin,
         credentials: true,
     })
 );
@@ -71,16 +72,19 @@ app.use((err, req, res, next)=>{
 
 const connectDB = async ()=>{
     try{
-        await mongoose.connect(process.env.LOCAL_MONGODB_URI)
-        console.log("Connected with database")
+        const mongoUri = process.env.MONGODB_URI || process.env.LOCAL_MONGODB_URI;
+        await mongoose.connect(mongoUri, {
+            dbName: "NovaChat",
+        });
+        console.log("Connected with MongoDB Atlas database")
     } catch(err){
-        console.log("Failed to connect with Db", err)
+        console.log("Failed to connect with MongoDB Atlas database", err)
     }
 }
 
 app.listen(PORT, ()=>{
     console.log(`server running on port ${PORT}`)
-    connectDB()
+    connectDB() 
 }) 
 
 

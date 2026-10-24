@@ -406,8 +406,9 @@ async function main() {
     const generate = SKIP_GENERATION ? null : createGenerator();
     console.log(`Loaded ${dataset.length} queries from ${DATASET_PATH}`);
 
-    await mongoose.connect(process.env.LOCAL_MONGODB_URI);
-    console.log("Connected to MongoDB.\n");
+    const mongoUri = process.env.MONGODB_URI || process.env.LOCAL_MONGODB_URI; // change this in prod.
+    await mongoose.connect(mongoUri, { dbName: "NovaChat" });
+    console.log("Connected to MongoDB Atlas.\n");
 
     try {
         console.log("Resetting the evaluation thread and indexing test documents...");
