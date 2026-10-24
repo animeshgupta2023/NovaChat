@@ -23,7 +23,12 @@ const DocumentMetaSchema = new mongoose.Schema({
     },
     summary: {
         type: String,
-        required: true,
+        default: "",
+    },
+    status: {
+        type: String,
+        enum: ["pending", "processing", "ready", "failed"],
+        default: "ready",
     },
     uploadedAt: {
         type: Date,

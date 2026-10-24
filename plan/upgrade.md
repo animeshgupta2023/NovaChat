@@ -43,6 +43,7 @@
 
 ---
 
+# done
 ## Phase 3 — LangChain Core, Smart Multi-Doc RAG Router & Evals (Your Technical Moat)
 
 - [ ] **The 40-Query RAG & Router Eval Harness (`EVAL.md`):**

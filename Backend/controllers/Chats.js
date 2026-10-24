@@ -138,7 +138,7 @@ const chat = async (req, res) => {
 
             const routeDecision = await routeQuery(
                 message,
-                thread.documents,
+                thread.documents.filter((document) => !document.status || document.status === "ready"),
                 thread.messages.slice(-4)
             );
             console.log("[RAG Router]:", routeDecision);

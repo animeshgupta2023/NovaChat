@@ -76,6 +76,7 @@ export default function ChatWindow() {
         try {
 
             if(fileToUpload){
+                setStatusText("Uploading document...")
                 await uploadStagedDocument(fileToUpload)
             }
 
@@ -245,7 +246,25 @@ export default function ChatWindow() {
         if (!response.ok) {
             throw new Error(result.error || result.message || "Document upload failed")
         }
-        return result
+
+        setStatusText("Processing document...")
+        while (true) {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            const statusResponse = await fetch(
+                `${API_URL}/document/${result.documentId}/status`,
+                { credentials: "include" }
+            )
+            const statusResult = await statusResponse.json().catch(() => ({}))
+            if (!statusResponse.ok) {
+                throw new Error(statusResult.error || "Unable to check document processing status")
+            }
+            if (statusResult.status === "ready") {
+                return statusResult
+            }
+            if (statusResult.status === "failed") {
+                throw new Error(statusResult.error || "Document processing failed")
+            }
+        }
     }
 
     return (

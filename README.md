@@ -21,6 +21,7 @@ This repository is an actively developed project, not a production-hardened serv
 flowchart LR
     Browser[React + Vite browser]
     API[Express API]
+    Worker[Document worker thread]
     Auth[Passport + session cookie]
     Mongo[(MongoDB)]
     Router[Groq query router]
@@ -33,6 +34,8 @@ flowchart LR
     API --> Auth
     Auth --> Mongo
     API -->|threads and document chunks| Mongo
+    API -->|queued file data| Worker
+    Worker -->|summaries and embeddings| Mongo
     API -->|SSE response and status events| Browser
     API --> Router
     API --> Gemini
@@ -52,11 +55,11 @@ flowchart LR
 
 ### Document ingestion and retrieval
 
-1. The authenticated user uploads a file to a thread. The frontend offers PDF and TXT files.
-2. The API extracts PDF text with `pdf-parse`; non-PDF payloads are decoded as UTF-8. Gemini summarizes up to the first 8,000 characters for the thread's document catalog.
+1. The authenticated user uploads a file to a thread. The frontend offers PDF and TXT files. The API stores a pending document entry and immediately queues the upload in a Node.js worker thread.
+2. The worker extracts PDF text with `pdf-parse`; text payloads are decoded as UTF-8. Gemini summarizes up to the first 8,000 characters for the thread's document catalog.
 3. LangChain's `RecursiveCharacterTextSplitter` creates chunks of about 1,000 characters with 150 characters of overlap. Chunks of 50 characters or fewer are discarded.
-4. Transformers.js runs `Xenova/all-MiniLM-L6-v2` locally to create normalized embeddings. Chunk text, vectors, owner, thread, and filename are stored in MongoDB.
-5. For document-related questions, the API embeds search queries locally and computes cosine similarity against that thread's chunks. Multi-query results are fused with RRF.
+4. Transformers.js runs `Xenova/all-MiniLM-L6-v2` in the worker thread to create normalized embeddings. Chunk text, vectors, owner, thread, and filename are stored in MongoDB. The frontend polls the document status endpoint and continues chat after processing is complete.
+5. For document-related questions, the API embeds search queries locally and computes cosine similarity against that thread's ready document chunks. Multi-query results are fused with RRF.
 
 The router supports `DIRECT`, `RAG_SINGLE`, `RAG_REWRITE`, and `RAG_DECOMPOSE` decisions. Single-query retrieval returns up to three chunks above a 0.38 similarity threshold. Multi-query retrieval searches up to four chunks per sub-query (using a 0.35 threshold), fuses rankings, and returns up to four chunks.
 
