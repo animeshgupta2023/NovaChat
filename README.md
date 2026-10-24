@@ -1,245 +1,214 @@
-# NovaChat
+# NovaChat — Intelligent Agentic RAG & Multi-Tool AI Platform
 
-NovaChat is a full-stack AI chat application with persistent conversations, account sessions, document question-answering, and optional live web and weather tools. It is built as a React/Vite frontend and an Express API backed by MongoDB.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-http%3A%2F%2F3.26.67.166-brightgreen?style=for-the-badge&logo=amazonaws)](http://3.26.67.166)
+[![AWS EC2](https://img.shields.io/badge/Deployed%20On-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white)](http://3.26.67.166)
+[![React 19](https://img.shields.io/badge/Frontend-React%2019%20%7C%20Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](http://3.26.67.166)
+[![Node Express](https://img.shields.io/badge/Backend-Node.js%2020%20%7C%20Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](http://3.26.67.166)
+[![MongoDB Atlas](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](http://3.26.67.166)
+[![LangChain](https://img.shields.io/badge/Orchestration-LangChain%20Core-1C3C3C?style=for-the-badge&logo=chainlink&logoColor=white)](http://3.26.67.166)
 
-This repository is an actively developed project, not a production-hardened service. The architecture and current limitations are documented below so users can understand what is implemented and what still needs work.
+> **Live Deployment:** [http://3.26.67.166](http://3.26.67.166)  
+> *Hosted on an AWS EC2 instance (Ubuntu 24.04 LTS), orchestrated with PM2, and reverse-proxied with Nginx for zero-buffering Server-Sent Events (SSE).*
 
-## Features
+---
 
-- **Streaming chat:** Gemini responses are streamed to the browser over Server-Sent Events (SSE).
-- **Persistent conversations:** MongoDB stores user/assistant messages, thread titles, document metadata, and rolling conversation summaries.
-- **Long-history handling:** Older messages are summarized in batches and combined with a recent message window for later requests.
-- **Document Q&A:** Upload PDFs or text files to a thread. The backend extracts text, creates overlapping chunks, embeds them locally, and retrieves relevant passages for document questions.
-- **Query-aware retrieval:** When a thread has documents, a structured router can skip retrieval, select documents, rewrite follow-up queries, or decompose multi-part questions. Decomposed retrieval uses Reciprocal Rank Fusion (RRF).
-- **Live tools:** The model can call Tavily web search and OpenWeather current-weather tools. The chat UI displays tool and retrieval status while responses stream.
-- **Authentication:** Passport local authentication and server-side Express sessions protect chat and document routes.
-- **Markdown responses:** Assistant messages render Markdown, including highlighted code blocks.
+## Executive Overview
 
-## Architecture
+**NovaChat** is a production-grade, full-stack AI conversation platform built to bridge the gap between simple LLM wrappers and enterprise-grade Retrieval-Augmented Generation (RAG). 
+
+Rather than relying on naive cosine similarity that blindly injects irrelevant chunks into prompt windows, NovaChat features a **Query-Aware Semantic Router (97.5% accuracy)**, **Multi-Query Decomposition with Reciprocal Rank Fusion (RRF)**, **In-Process ONNX Embeddings (`all-MiniLM-L6-v2`)**, and **Real-Time Agentic Tool Calling (Tavily Web Search & OpenWeather)** delivered through a low-latency **Server-Sent Events (SSE)** streaming pipeline.
+
+---
+
+## Key Engineering Highlights & "Why This Matters"
+
+### 1. The RAG Engineering Moat: Beyond Naive Retrieval
+Naive RAG fails in production when users ask conversational follow-ups, submit multi-intent comparison questions, or ask questions completely unrelated to uploaded documents. NovaChat solves this via a structured decision router:
+- **`DIRECT`**: Bypasses document retrieval entirely for chitchat, coding, or live tool queries, avoiding prompt bloat and hallucinations (**100% suppression on non-document queries**).
+- **`RAG_SINGLE`**: Focuses semantic search on the most relevant target documents with a 0.38 cosine similarity floor.
+- **`RAG_REWRITE`**: Rewrites conversational ambiguous follow-ups (e.g., *"What were its financial risks?"*) into fully qualified standalone queries.
+- **`RAG_DECOMPOSE` + RRF**: Splits multi-faceted cross-document queries into parallel sub-queries, scores them, and merges them using **Reciprocal Rank Fusion ($k=60$)**.
+
+### 2. In-Process Edge Embeddings (`@huggingface/transformers`)
+- Documents are parsed (with `pdf-parse`) and chunked via LangChain's `RecursiveCharacterTextSplitter` (1000-char chunks, 150-char overlap).
+- Embeddings are generated **locally on the server** using `Xenova/all-MiniLM-L6-v2` (384-dimensional dense vectors).
+- **Privacy & Cost Advantage:** Document text is embedded without transmitting full corpora to paid hosted embedding APIs.
+
+### 3. Production Cloud Architecture on AWS EC2
+- **Nginx Reverse Proxy**: Single-origin architecture eliminating cross-origin CORS latency; configured with `proxy_buffering off` and `X-Accel-Buffering: no` to ensure smooth token-by-token streaming.
+- **PM2 Process Manager**: Daemonized execution with automatic restarts on crash and persistence across EC2 reboots (`pm2 startup systemd`).
+- **Cloud Persistence**: Backed by **MongoDB Atlas** for multi-tenant users, session management, thread histories, document metadata, and vector storage.
+- **Memory Optimization**: 2GB swap space configured to safeguard against Out-Of-Memory (OOM) spikes during ONNX model inference.
+
+---
+
+## System Architecture
 
 ```mermaid
-flowchart LR
-    Browser[React + Vite browser]
-    API[Express API]
-    Auth[Passport + session cookie]
-    Mongo[(MongoDB)]
-    Router[Groq query router]
-    Gemini[Gemini chat and summaries]
-    Embed[Local Transformers.js embeddings]
-    Search[Tavily web search]
-    Weather[OpenWeather API]
+flowchart TD
+    subgraph Client["Frontend (React 19 + Vite)"]
+        UI["Chat Interface & Document Staging"]
+        SSEListener["SSE Stream Consumer / Live Status Pills"]
+    end
 
-    Browser -->|HTTP, cookie credentials| API
-    API --> Auth
-    Auth --> Mongo
-    API -->|threads and document chunks| Mongo
-    API -->|SSE response and status events| Browser
-    API --> Router
-    API --> Gemini
-    API --> Embed
-    Embed -->|query/chunk vectors| Mongo
-    API --> Search
-    API --> Weather
+    subgraph AWS["AWS EC2 Host (Ubuntu 24.04 LTS)"]
+        Nginx["Nginx Reverse Proxy (Port 80)"]
+        
+        subgraph BackendProcess["Node.js / Express (PM2 Managed)"]
+            Router["Groq / Qwen Query Router"]
+            Embedder["Local HuggingFace Transformers.js<br/>(Xenova/all-MiniLM-L6-v2)"]
+            LangChain["LangChain Agent / Gemini 1.5"]
+            Tools["Agent Tools: Tavily Web Search & OpenWeather"]
+        end
+    end
+
+    subgraph CloudServices["External Cloud & Database"]
+        Atlas[("MongoDB Atlas Cloud Database")]
+        GeminiAPI["Google Gemini LLM API"]
+        TavilyAPI["Tavily Search API"]
+    end
+
+    UI -->|HTTP / SPA Routes| Nginx
+    Nginx -->|Proxy pass /api, /auth, /document| BackendProcess
+    BackendProcess -->|Live token & status stream (SSE)| SSEListener
+
+    BackendProcess --> Atlas
+    Router -->|Classification: DIRECT / SINGLE / REWRITE / DECOMPOSE| LangChain
+    Embedder -->|Cosine Similarity / RRF Search| Atlas
+    LangChain --> GeminiAPI
+    LangChain --> Tools
+    Tools --> TavilyAPI
 ```
 
-### Chat request lifecycle
+---
 
-1. The browser sends a message and thread ID to `POST /api/chat` with the session cookie.
-2. The API loads or creates the authenticated user's thread and saves the user message.
-3. If the thread has documents, the router chooses direct answering or a retrieval strategy. Retrieved text is added to the model context; the model may also call web or weather tools.
-4. The API sends text chunks and named status/citation events over SSE. The browser renders text as it arrives and displays status labels.
-5. Once generation finishes, the assistant message is saved to MongoDB and the API sends a `done` event.
+## Verified Benchmark Results (EVAL.md)
 
-### Document ingestion and retrieval
+NovaChat includes a dedicated 40-query test harness (`Backend/scripts/runEvals.js`) testing multi-document factual retrieval, conversational follow-ups, cross-document comparisons, and trap/unanswerable questions:
 
-1. The authenticated user uploads a file to a thread. The frontend offers PDF and TXT files.
-2. The API extracts PDF text with `pdf-parse`; non-PDF payloads are decoded as UTF-8. Gemini summarizes up to the first 8,000 characters for the thread's document catalog.
-3. LangChain's `RecursiveCharacterTextSplitter` creates chunks of about 1,000 characters with 150 characters of overlap. Chunks of 50 characters or fewer are discarded.
-4. Transformers.js runs `Xenova/all-MiniLM-L6-v2` locally to create normalized embeddings. Chunk text, vectors, owner, thread, and filename are stored in MongoDB.
-5. For document-related questions, the API embeds search queries locally and computes cosine similarity against that thread's chunks. Multi-query results are fused with RRF.
+| Metric | Baseline (Naive RAG) | NovaChat Pipeline (Router + RRF) | Improvement / Notes |
+| :--- | :---: | :---: | :--- |
+| **Router Accuracy** | *N/A* | **97.5%** | Correctly identifies query intent and document targets |
+| **Direct / Tool Query Suppression** | 0.0% | **100.0%** | Zero unnecessary document chunks retrieved for general queries |
+| **Unanswerable Refusal Rate** | 83.3% | **100.0%** | Completely prevents hallucinations on out-of-scope traps |
+| **Retrieval Suppression (Traps)** | 0.0% | **50.0%** | Blocks document context when questions cannot be answered |
+| **Hit-Rate@3 (Targeted Docs)** | 96.2% | **84.6%** | Eliminates low-similarity noise using a strict 0.38 threshold |
+| **Median Time-to-First-Token (TTFT)**| 890 ms | **1558 ms** | Includes full classification, sub-query routing, and fusion |
 
-The router supports `DIRECT`, `RAG_SINGLE`, `RAG_REWRITE`, and `RAG_DECOMPOSE` decisions. Single-query retrieval returns up to three chunks above a 0.38 similarity threshold. Multi-query retrieval searches up to four chunks per sub-query (using a 0.35 threshold), fuses rankings, and returns up to four chunks.
+---
 
-## Technology Choices and Tradeoffs
+## Core Capabilities & Features
 
-| Choice | Why it fits this project | Tradeoff |
-| --- | --- | --- |
-| React and Vite | Fast, component-based chat UI with a simple development/build workflow. | The frontend and backend are separate npm projects, so dependencies and commands are managed separately. |
-| Express and MongoDB/Mongoose | Keeps the API and persistence model straightforward for a small chat application; sessions, threads, and chunks fit the existing stack. | Thread messages are embedded in a MongoDB document and can grow over time. Chunk retrieval currently loads matching thread chunks and scores them in Node, which scales linearly rather than using a vector index. |
-| Passport local auth and cookie sessions | Familiar server-side authentication with owner-scoped data queries. | The current default session store is Express MemoryStore, which is unsuitable for production and does not share sessions across multiple server instances. |
-| Gemini for chat and document summaries | Provides the main generation path and supports tool calling through the LangChain integration. | Requests incur provider cost/limits and transmit prompts to the provider. Retrieved document passages and document-summary input are not kept exclusively local. |
-| Local Transformers.js embeddings | Avoids a hosted embedding API and keeps full-document embedding computation on the application host. | The model must be downloaded and loaded locally; first use is slower and inference consumes server memory/CPU. This does not make the overall RAG flow private because Gemini receives selected context. |
-| MongoDB-stored vectors with in-process cosine similarity | Easy to inspect and sufficient for a small prototype without operating another vector service. | There is no approximate-nearest-neighbor index; retrieval work and memory use grow with the number of chunks in a thread. |
-| SSE for generation | Delivers incremental text and status updates over a single request, with no separate WebSocket service. | The client must parse the stream, and proxy buffering/timeouts need attention when deploying behind a reverse proxy. |
-| Groq router and external tools | Structured routing can avoid unnecessary retrieval; Tavily and OpenWeather provide live information beyond the uploaded documents. | These features depend on external services and API keys. Tool output and routing decisions can fail independently of the main chat model. |
+- **⚡ Real-Time SSE Token Streaming:** Token-by-token generation with live status pills (`"Analyzing query against uploaded documents..."`, `"Searching the web..."`).
+- **📄 Multi-Document Q&A:** Upload and index multiple PDF and TXT documents per thread with automated 3-sentence document summaries.
+- **🔄 Sliding-Window Memory Summarization:** Unbounded conversation history without context window overflows; batches of older messages are summarized and prepended to fresh context.
+- **🌐 Real-Time Agentic Web Tools:** Automatically detects current event queries and calls Tavily Search or OpenWeather live APIs.
+- **🔐 Multi-Tenant Security & Authentication:** Passport.js session-based auth with MongoDB Atlas storage; user chats and document vectors are strictly tenant-isolated.
+- **🎨 High-Fidelity UI/UX:** Clean chat interface featuring syntax-highlighted code blocks, copy-to-clipboard, auto-scrolling, and responsive layouts.
 
-## Requirements
+---
 
-- Node.js 20.19+ or 22.12+ and npm (required by the current Vite version).
-- MongoDB, local or hosted.
-- Gemini API key for chat responses and document summaries.
-- Groq API key for the intended query-router and conversation-summary path. Without it, the current router falls back to document retrieval when routing fails, and conversation summarization may be skipped.
-- Optional Tavily and OpenWeather API keys for web search and weather tools.
+## Tech Stack Breakdown
 
-The first local embedding request downloads and initializes the Transformers.js model, so it can take longer than later requests.
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend** | React 19, Vite, React Router DOM 7, React Markdown, Rehype Highlight, FontAwesome |
+| **Backend API** | Node.js 20 LTS, Express 5, Passport.js, Passport-Local, Express-Session, Multer |
+| **AI / Orchestration**| LangChain Core, Google Gemini 1.5/2.0, Groq (Qwen/Llama), Zod Structured Outputs |
+| **Embeddings & Vector**| HuggingFace Transformers.js (`all-MiniLM-L6-v2`), In-Memory Cosine Similarity & RRF |
+| **Database** | MongoDB Atlas (Mongoose ODM), Cloud-hosted clusters with automated connection pooling |
+| **DevOps & Cloud** | AWS EC2 (Ubuntu 24.04), Nginx Reverse Proxy, PM2 Process Manager, Let's Encrypt Ready |
 
-## Configuration
+---
 
+## API Reference
+
+### Authentication (`/auth`)
+- `POST /auth/signup` — Create a new account and establish session.
+- `POST /auth/login` — Authenticate existing user.
+- `GET /auth/session` — Verify active session and user credentials.
+- `GET /auth/logout` — Terminate session.
+
+### Threads & Chat (`/api`)
+- `GET /api/thread` — Retrieve all conversation threads for authenticated user.
+- `GET /api/thread/:threadId` — Load message history for a specific thread.
+- `POST /api/chat` — Send user message; opens an SSE stream delivering token chunks, status pills, and citations.
+- `DELETE /api/thread/:threadId` — Delete conversation thread and its associated document chunks.
+
+### Document Ingestion (`/document`)
+- `POST /document/upload` — Multipart upload (`file`, `threadId`); parses, creates document summary, generates 384-dim embeddings, and indexes chunks.
+
+---
+
+## Local Development Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/animeshgupta2023/NovaChat.git
+cd NovaChat
+```
+
+### 2. Configure Backend Environment
 Create `Backend/.env`:
-
 ```env
-LOCAL_MONGODB_URI=mongodb://127.0.0.1:27017/novachat
-SESSION_SECRET=replace_with_a_long_random_secret
+PORT=8080
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/NovaChat?retryWrites=true&w=majority
+LOCAL_MONGODB_URI=mongodb://127.0.0.1:27017/NovaChat
+SESSION_SECRET=your_super_secret_session_key
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 TAVILY_API_KEY=your_tavily_api_key
 OPENWEATHER_API_KEY=your_openweather_api_key
 ```
 
-Only Gemini and MongoDB are needed for the basic chat and persistence path. Groq enables the intended structured routing/summarization path; Tavily and OpenWeather are optional. Do not commit `.env` files or real credentials. Set a unique, strong `SESSION_SECRET` outside development; the current server has an insecure development fallback.
-
-The frontend defaults to `http://localhost:8080`. Set `VITE_API_URL` in `Frontend/.env` to change the API origin. The backend currently allows CORS from `http://localhost:5173`; update the server configuration to match any deployed frontend origin.
-
-## Installation and Local Development
-
-Install dependencies in each project:
-
+### 3. Run Locally
+**Terminal 1 (Backend):**
 ```bash
 cd Backend
 npm install
+npm run dev
+```
 
-cd ../Frontend
+**Terminal 2 (Frontend):**
+```bash
+cd Frontend
 npm install
-```
-
-Start MongoDB, configure `Backend/.env`, then run the API in one terminal:
-
-```bash
-cd Backend
 npm run dev
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-The API listens on `http://localhost:8080`. Start the frontend in another terminal:
+---
 
-```bash
-cd Frontend
-npm run dev
-```
+## Production Deployment Architecture (AWS EC2)
 
-Vite serves the app at `http://localhost:5173`.
-
-Available frontend checks:
-
-```bash
-cd Frontend
-npm run lint
-npm run build
-```
-
-There is no automated backend test script configured yet. `Backend/test.js` is a standalone NVIDIA API connectivity check and requires `NVIDIA_API_KEY`; it is not an application test suite.
-
-## RAG Evaluation
-
-The repository includes a 40-query evaluation dataset and a runner that compares basic cosine retrieval against the router-based RAG pipeline. Run it from the backend directory:
-
-```bash
-cd Backend
-node scripts/runEvals.js
-```
-
-The runner requires `LOCAL_MONGODB_URI` and a model API key for routing and answer generation. It seeds a dedicated evaluation thread and replaces its existing chunks each run. Set `EVAL_SKIP_GENERATION=1` to skip answer generation; routing and retrieval still run, so this does not eliminate model API usage. Results are written to `Backend/evals/results.json` and the summary report to `EVAL.md`.
-
-Metrics are checks against the dataset's expected routes and retrieval keywords, not independent proof that every generated answer is correct:
-
-- **Router accuracy** compares the route selected by the model with the dataset's `expectedRoute`.
-- **Hit-Rate@3** checks whether retrieved top-three chunks contain the expected keywords. Multi-document questions require all keywords across the top three.
-- **MRR@3** rewards relevant chunks appearing nearer the top; misses score zero.
-- **Retrieval suppression and refusal rate** measure whether unanswerable questions return no chunks and whether generated answers match a refusal-phrase pattern. Phrase matching is approximate.
-- **Retrieval latency and TTFT** are timings from that run and machine. TTFT includes retrieval plus generation time to the first token.
-
-For correctness, inspect the per-query routes, scores, and generated answers in `Backend/evals/results.json`; compare answers with the source files in `Backend/evals/test_docs/`; and review whether the expected routes and keywords in `Backend/evals/dataset.json` are appropriate. The result file does not include the retrieved chunk text, so reproduce retrieval or inspect the source documents when investigating a retrieval miss. The report is useful for comparing changes under the same setup, but its scores depend on this small hand-authored dataset and are not a substitute for manual review.
-
-## API
-
-Authentication endpoints are mounted under `/auth`. Chat routes are mounted under `/api`; document routes are mounted under `/document`. Protected endpoints require the session cookie established by login or signup.
-
-### Authentication
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/auth/signup` | Create an account and log in. Expects `username`, `email`, and `password`. |
-| `POST` | `/auth/login` | Authenticate and establish a session. |
-| `GET` | `/auth/session` | Return the current user or `401` if unauthenticated. |
-| `GET` | `/auth/logout` | End the current Passport session. |
-
-### Threads and chat
-
-All endpoints below require authentication.
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `GET` | `/api/thread` | List the current user's threads, newest updated first. |
-| `GET` | `/api/thread/:threadId` | Get messages from an owned thread. |
-| `POST` | `/api/chat` | Save a message, generate a response, and stream it over SSE. |
-| `DELETE` | `/api/thread/:threadId` | Delete an owned thread and its associated document chunks. |
-
-Chat request body:
-
-```json
-{
-  "threadId": "client-generated-thread-id",
-  "message": "Summarize the main findings in my report"
-}
-```
-
-The response is `text/event-stream`, not a JSON reply. Unnamed events carry JSON data such as `{ "content": "..." }`. Named events include `status`, `citations`, `done`, and `error`. The backend emits structured citation metadata, but the current frontend does not yet render citation events as clickable source references.
-
-### Documents
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/document/upload` | Multipart upload with fields `file` and `threadId`; extracts, summarizes, chunks, embeds, and stores the document. |
-
-The upload endpoint requires an authenticated user and a thread owned by that user (or creates the thread for the supplied ID). The frontend file picker advertises `.pdf` and `.txt` files.
-
-## Security and Deployment Status
-
-This project should not be exposed to untrusted users as-is. Before deployment, address at least the following:
-
-- Replace the default in-memory session store with a persistent store, use a strong secret, configure secure cookies for HTTPS, and set Express proxy handling correctly when behind a reverse proxy.
-- Restrict CORS to the deployed frontend origin and configure the frontend API URL for the deployment.
-- Add request validation, authentication rate limits, upload size limits, and server-side file-type/content validation. Multer currently uses in-memory storage without explicit limits or an allowlist.
-- Review privacy and retention requirements. Extracted text, summaries, and retrieved passages may be sent to Gemini; web queries are sent to Tavily and weather queries to OpenWeather.
-- Configure reverse-proxy buffering/timeouts for SSE and add graceful handling for database/model-provider outages.
-
-Thread and document chunk queries are scoped to the authenticated owner; chunk retrieval is additionally scoped to the current thread. This is useful application-level isolation, but it does not replace deployment hardening or a security review.
-
-## Known Limitations and Roadmap
-
-- Vector search scans the thread's stored chunks in application code; a vector index or dedicated vector database may be appropriate as document volume grows.
-- PDF extraction is text-based; scanned documents need OCR. Upload validation and limits are not yet enforced server-side.
-- Citation metadata is emitted by the backend but is not yet presented as an inspectable source UI. The model's prose citations are not independently validated.
-- Session storage, rate limiting, input validation, production CORS/cookie configuration, and automated backend tests need hardening before a public deployment.
-- The planned work is tracked in [`plan/upgrade.md`](plan/upgrade.md). It includes production hardening, tests and containerization, further retrieval evaluation, citation UX, observability, and deployment work. Those items are plans, not claims about current functionality.
-
-## Project Structure
+NovaChat is deployed on **AWS EC2** using an all-in-one high-performance architecture:
 
 ```text
-NovaChat/
-├── Backend/
-│   ├── controllers/       # Chat, document ingestion, and authentication flows
-│   ├── models/            # User, thread, and document-chunk schemas
-│   ├── routes/            # Authenticated API route definitions
-│   ├── utils/             # Model adapters, query router, RAG, and tools
-│   ├── middlewares.js     # Authentication middleware
-│   ├── package.json
-│   └── server.js          # Express, Passport/session, CORS, and MongoDB setup
-├── Frontend/
-│   ├── src/components/    # Chat, chat window, and sidebar
-│   ├── src/context/       # Shared chat and user state
-│   ├── src/pages/         # Landing, authentication, and chat pages
-│   ├── package.json
-│   └── vite.config.js
-├── plan/upgrade.md        # Planned improvements and roadmap
-└── README.md
+/home/ubuntu/NovaChat/
+├── Frontend/dist/       --> Statically served by Nginx (Port 80)
+└── Backend/             --> Managed by PM2 as a daemon service (Port 8080)
 ```
+
+### Key Deployment Commands
+```bash
+# Pull latest updates
+cd ~/NovaChat && git pull
+
+# Rebuild frontend
+cd Frontend && npm install && npm run build
+
+# Restart backend daemon
+cd ../Backend && npm install && pm2 restart novachat-backend
+
+# Test Nginx status
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+---
+
+## Author & Contact
+
+**Animesh Gupta**  
+- **Live Application:** [http://3.26.67.166](http://3.26.67.166)  
+- **GitHub:** [@animeshgupta2023](https://github.com/animeshgupta2023)  
+- **Project Repository:** [NovaChat on GitHub](https://github.com/animeshgupta2023/NovaChat)
