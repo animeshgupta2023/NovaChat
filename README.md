@@ -1,14 +1,14 @@
 # NovaChat — Intelligent Agentic RAG & Multi-Tool AI Platform
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-http%3A%2F%2F3.26.67.166-brightgreen?style=for-the-badge&logo=amazonaws)](http://3.26.67.166)
-[![AWS EC2](https://img.shields.io/badge/Deployed%20On-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white)](http://3.26.67.166)
-[![React 19](https://img.shields.io/badge/Frontend-React%2019%20%7C%20Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](http://3.26.67.166)
-[![Node Express](https://img.shields.io/badge/Backend-Node.js%2020%20%7C%20Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](http://3.26.67.166)
-[![MongoDB Atlas](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](http://3.26.67.166)
-[![LangChain](https://img.shields.io/badge/Orchestration-LangChain%20Core-1C3C3C?style=for-the-badge&logo=chainlink&logoColor=white)](http://3.26.67.166)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-https%3A%2F%2Fnovachat--ai.duckdns.org-brightgreen?style=for-the-badge&logo=googlechrome&logoColor=white)](https://novachat-ai.duckdns.org)
+[![AWS EC2](https://img.shields.io/badge/Deployed%20On-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white)](https://novachat-ai.duckdns.org)
+[![SSL Secured](https://img.shields.io/badge/SSL-Let's%20Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)](https://novachat-ai.duckdns.org)
+[![React 19](https://img.shields.io/badge/Frontend-React%2019%20%7C%20Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://novachat-ai.duckdns.org)
+[![Node Express](https://img.shields.io/badge/Backend-Node.js%2020%20%7C%20Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://novachat-ai.duckdns.org)
+[![MongoDB Atlas](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://novachat-ai.duckdns.org)
 
-> **Live Deployment:** [http://3.26.67.166](http://3.26.67.166)  
-> *Hosted on an AWS EC2 instance (Ubuntu 24.04 LTS), orchestrated with PM2, and reverse-proxied with Nginx for zero-buffering Server-Sent Events (SSE).*
+> **Live Deployment:** [https://novachat-ai.duckdns.org](https://novachat-ai.duckdns.org)  
+> *Hosted on an AWS EC2 instance (Ubuntu 24.04 LTS), SSL-secured with Let's Encrypt / Certbot, orchestrated with PM2, and reverse-proxied with Nginx for zero-buffering Server-Sent Events (SSE).*
 
 ---
 
@@ -52,7 +52,7 @@ flowchart TD
     end
 
     subgraph AWS["AWS EC2 Host (Ubuntu 24.04 LTS)"]
-        Nginx["Nginx Reverse Proxy (Port 80)"]
+        Nginx["Nginx Reverse Proxy (Port 80 / 443 SSL)"]
         
         subgraph BackendProcess["Node.js / Express (PM2 Managed)"]
             Router["Groq / Qwen Query Router"]
@@ -117,7 +117,7 @@ NovaChat includes a dedicated 40-query test harness (`Backend/scripts/runEvals.j
 | **AI / Orchestration**| LangChain Core, Google Gemini 1.5/2.0, Groq (Qwen/Llama), Zod Structured Outputs |
 | **Embeddings & Vector**| HuggingFace Transformers.js (`all-MiniLM-L6-v2`), In-Memory Cosine Similarity & RRF |
 | **Database** | MongoDB Atlas (Mongoose ODM), Cloud-hosted clusters with automated connection pooling |
-| **DevOps & Cloud** | AWS EC2 (Ubuntu 24.04), Nginx Reverse Proxy, PM2 Process Manager, Let's Encrypt Ready |
+| **DevOps & Cloud** | AWS EC2 (Ubuntu 24.04), Nginx Reverse Proxy, PM2 Process Manager, Let's Encrypt SSL (Certbot) |
 
 ---
 
@@ -185,7 +185,7 @@ NovaChat is deployed on **AWS EC2** using an all-in-one high-performance archite
 
 ```text
 /home/ubuntu/NovaChat/
-├── Frontend/dist/       --> Statically served by Nginx (Port 80)
+├── Frontend/dist/       --> Statically served by Nginx (Port 80 / 443 HTTPS SSL)
 └── Backend/             --> Managed by PM2 as a daemon service (Port 8080)
 ```
 
@@ -209,6 +209,6 @@ sudo nginx -t && sudo systemctl reload nginx
 ## Author & Contact
 
 **Animesh Gupta**  
-- **Live Application:** [http://3.26.67.166](http://3.26.67.166)  
+- **Live Application:** [https://novachat-ai.duckdns.org](https://novachat-ai.duckdns.org)  
 - **GitHub:** [@animeshgupta2023](https://github.com/animeshgupta2023)  
 - **Project Repository:** [NovaChat on GitHub](https://github.com/animeshgupta2023/NovaChat)
