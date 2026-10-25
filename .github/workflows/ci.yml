@@ -1,4 +1,4 @@
-name: NovaChat CI
+name: NovaChat CI/CD
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
+  # 1. Test and build to catch any errors before touching the server
   build-and-check:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [22.x] # 22 LTS is standard and stable for @huggingface/transformers
+        node-version: [22.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -22,20 +22,42 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    # 1. Check Backend syntax & dependencies
-    - name: Install Backend Dependencies
+    - name: Install & Check Backend
       working-directory: ./Backend
-      run: npm install
+      run: |
+        npm install
+        node --check server.js
 
-    - name: Syntax Check Backend
-      working-directory: ./Backend
-      run: node --check server.js
-
-    # 2. Check Frontend build
-    - name: Install Frontend Dependencies
+    - name: Install & Build Frontend
       working-directory: ./Frontend
-      run: npm install
+      run: |
+        npm install
+        npm run build
 
-    - name: Build Frontend
-      working-directory: ./Frontend
-      run: npm run build
+  # 2. Automatically deploy to EC2 when pushed to main
+  deploy:
+    needs: build-and-check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # 1. Pull latest code
+          cd ~/NovaChat
+          git pull origin main
+
+          # 2. Update Backend and restart PM2
+          cd Backend
+          npm install
+          pm2 restart novachat-backend
+
+          # 3. Update Frontend build for Nginx
+          cd ../Frontend
+          npm install
+          npm run build

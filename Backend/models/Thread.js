@@ -23,7 +23,7 @@ const DocumentMetaSchema = new mongoose.Schema({
     },
     summary: {
         type: String,
-        default: "",
+        required: true,
     },
     uploadedAt: {
         type: Date,
