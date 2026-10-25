@@ -18,9 +18,28 @@ const PORT = process.env.PORT || 8080
 app.set("trust proxy", 1);
 app.use(express.json())  
 
-const allowedOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-app.use(cors({
-        origin: process.env.NODE_ENV === "production" ? true : allowedOrigin,
+const allowedOrigins = [
+    process.env.CLIENT_ORIGIN,
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:3000",
+].filter(Boolean);
+
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            if (
+                process.env.NODE_ENV === "production" ||
+                allowedOrigins.includes(origin) ||
+                /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+            ) {
+                return callback(null, true);
+            }
+            return callback(new Error(`Not allowed by CORS: ${origin}`));
+        },
         credentials: true,
     })
 );

@@ -65,10 +65,15 @@ export default function Authentication() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Fallback for non-JSON responses
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Authentication failed.");
+        throw new Error(data.message || `Authentication failed (${response.status}: ${response.statusText || "Server error"})`);
       }
 
       const user = data.user || { username: formData.username, email: formData.email || "" };
@@ -77,7 +82,12 @@ export default function Authentication() {
       localStorage.setItem("novachat_user", JSON.stringify(user));
       navigate("/home");
     } catch (submitError) {
-      setError(submitError.message || "Something went wrong. Please try again.");
+      console.error("Auth request failed:", submitError);
+      if (submitError.name === "TypeError" && submitError.message.toLowerCase().includes("fetch")) {
+        setError(`Unable to connect to backend server at ${API_URL || window.location.origin}. Please make sure the backend is running on port 8080.`);
+      } else {
+        setError(submitError.message || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
