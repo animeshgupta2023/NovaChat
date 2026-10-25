@@ -56,7 +56,7 @@ flowchart TD
         
         subgraph BackendProcess["Node.js / Express (PM2 Managed)"]
             Router["Groq / Qwen Query Router"]
-            Embedder["Local HuggingFace Transformers.js<br/>(Xenova/all-MiniLM-L6-v2)"]
+            Embedder["Local HuggingFace Transformers.js (Xenova/all-MiniLM-L6-v2)"]
             LangChain["LangChain Agent / Gemini 1.5"]
             Tools["Agent Tools: Tavily Web Search & OpenWeather"]
         end
@@ -68,13 +68,13 @@ flowchart TD
         TavilyAPI["Tavily Search API"]
     end
 
-    UI -->|HTTP / SPA Routes| Nginx
-    Nginx -->|Proxy pass /api, /auth, /document| BackendProcess
-    BackendProcess -->|Live token & status stream (SSE)| SSEListener
+    UI -->|"HTTP / SPA Routes"| Nginx
+    Nginx -->|"Proxy pass /api, /auth, /document"| BackendProcess
+    BackendProcess -->|"Live token & status stream (SSE)"| SSEListener
 
     BackendProcess --> Atlas
-    Router -->|Classification: DIRECT / SINGLE / REWRITE / DECOMPOSE| LangChain
-    Embedder -->|Cosine Similarity / RRF Search| Atlas
+    Router -->|"Classification: DIRECT / SINGLE / REWRITE / DECOMPOSE"| LangChain
+    Embedder -->|"Cosine Similarity / RRF Search"| Atlas
     LangChain --> GeminiAPI
     LangChain --> Tools
     Tools --> TavilyAPI
