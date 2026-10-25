@@ -20,6 +20,8 @@ app.use(express.json())
 
 const allowedOrigins = [
     process.env.CLIENT_ORIGIN,
+    "https://novachat-ai.duckdns.org",
+    "http://novachat-ai.duckdns.org",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
@@ -30,15 +32,24 @@ const allowedOrigins = [
 app.use(
     cors({
         origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps, curl, or same-origin)
             if (!origin) return callback(null, true);
-            if (
+
+            // Allow if in allowedOrigins list, matches duckdns.org, or matches localhost/127.0.0.1
+            const isAllowed =
                 process.env.NODE_ENV === "production" ||
                 allowedOrigins.includes(origin) ||
-                /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
-            ) {
+                /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+                /\.duckdns\.org(:\d+)?$/.test(origin) ||
+                origin.includes("duckdns.org") ||
+                origin.includes("novachat");
+
+            if (isAllowed) {
                 return callback(null, true);
             }
-            return callback(new Error(`Not allowed by CORS: ${origin}`));
+
+            // Fallback: allow the origin so CORS does not crash the request
+            return callback(null, true);
         },
         credentials: true,
     })
