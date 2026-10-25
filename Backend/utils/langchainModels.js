@@ -27,5 +27,5 @@ export function getRouterModel(){
             maxTokens: 300,
         });
     }
-    getChatModel("gemini", 0);
+    return getChatModel("gemini", 0);
 }
